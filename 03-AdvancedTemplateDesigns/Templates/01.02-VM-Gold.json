@@ -62,7 +62,7 @@
                         "value": "[parameters('templateUriBase')]"
                     },
                     "storageName": {
-                        "value": "[parameters('storageName')]"
+                        "value": "[variables('storageName')]"
                     },
                     "storageType": {
                         "value": "[variables('storageType')]"
