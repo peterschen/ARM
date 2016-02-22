@@ -37,7 +37,7 @@
         }
     },
     "variables": {
-        "vmSize": "Standard_DS1",
+        "vmSize": "Standard_D1",
         "vmOsPublisher": "MicrosoftWindowsServer",
         "vmOsOffer": "WindowsServer",
         "storageName": "[concat('hdd', parameters('storageName'))]",
