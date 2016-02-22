@@ -96,8 +96,8 @@ New-AzureRmResourceGroup -Name "ArmTemplates-01-IaaS" `
 Start the template deployment with a Template Parameter File
 ```
 New-AzureRmResourceGroupDeployment -Name "01-IaaS-VM-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\05-VM.json `
-    -TemplateParameterFile .\05-VM.parameters.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/01-IaaS/Templates/05-VM.json `
+    -TemplateParameterUri https://raw.githubusercontent.com/peterschen/ARM/master/01-IaaS/Templates/05-VM.parameters.json `
     -ResourceGroupName "ArmTemplates-01-IaaS" `
     -Verbose;
 ```
@@ -107,7 +107,6 @@ Start the template deployment by passing required arguments
 $adminPassword = ConvertTo-SecureString -String "Admin123" -AsPlainText -Force;
 New-AzureRmResourceGroupDeployment -Name "01-IaaS-VM-$(Get-Date -Format "yyMMdd-Hs")" `
     -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/01-IaaS/Templates/05-VM.json `
-    -TemplateParameterUri https://raw.githubusercontent.com/peterschen/ARM/master/01-IaaS/Templates/05-VM.parameters.json `
     -ResourceGroupName "ArmTemplates-01-IaaS" `
     -Verbose `
     -adminUsername "labadmin" `
