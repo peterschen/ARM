@@ -33,8 +33,7 @@
       <Visible>False</Visible>
     </None>
     <Content Include="Scripts\Deploy-AzureResourceGroup.ps1" />
-    <Content Include="Templates\empty.json" />
-    <Content Include="Templates\empty.parameters.json" />
+    <Content Include="Templates\01-Blank.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Tools\AzCopy.exe" />
