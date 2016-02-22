@@ -1,0 +1,16 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+        "oneWholeTruth": "[add(40, 2)]",
+        "anotherWholeTruth": "[mul(21, 2)]",
+        "firstHalfTruth": "[sub(42, 21)]",
+        "secondHalfTruth": "[div(42, 2)]"
+    },
+    "resources": [
+    ],
+    "outputs": {
+    }
+}

@@ -20,9 +20,19 @@ New-AzureRmResourceGroupDeployment -Name "02-AdvancedTemplateDesigns-01-$(Get-Da
 
 Start the template deployment by passing required arguments
 ```
+$adminPassword = ConvertTo-SecureString -String "Admin123" -AsPlainText -Force;
 New-AzureRmResourceGroupDeployment -Name "02-AdvancedTemplateDesigns-01-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFileUri https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates/01.01-Master.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates/01.01-Master.json `
     -ResourceGroupName "ArmTemplates-03-AdvancedTemplateDesigns" `
     -Verbose `
+    -serviceLevel "Gold" `
+    -vnetName "vnet-01" `
+    -publicIpName "pip-01" `
+    -nicName "nic-01" `
+    -vmName "adt-gold-01" `
+    -vmOsSku "Windows-Server-Technical-Preview" `
+    -dnsPrefix "adt-gold-01" `
+    -adminUsername "labadmin" `
+    -adminPassword $adminPassword;
     
 ```

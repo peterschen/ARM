@@ -34,6 +34,11 @@
     </None>
     <Content Include="Scripts\Deploy-AzureResourceGroup.ps1" />
     <Content Include="Templates\01-Blank.json" />
+    <None Include="Templates\02.01-NumericFunctions.json" />
+    <None Include="Templates\02.04-ResourceFunctions.json" />
+    <None Include="Templates\02.02-StringFunctions.json" />
+    <None Include="Templates\02.03-ArrayFunctions.json" />
+    <None Include="Templates\02.05-DeploymentValueFunctions.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Tools\AzCopy.exe" />

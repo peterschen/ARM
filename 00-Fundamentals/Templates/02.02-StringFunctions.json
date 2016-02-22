@@ -1,0 +1,19 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+        "concat": "[concat('piece', 'it', 'together')]",
+        "uniqueString": "[uniqueString('these', 'options', 'make', 'it', 'more', 'unique')]",
+        "substring": "[substring('longstring', 0, 4)]",
+        "replace": "[replace('longstring', 'long', 'short')]",
+        "trim": "[trim('   value')]",
+        "toLower": "[toLower('SHOUTING!')]",
+        "toUpper": "[toLower('whispering')]"
+    },
+    "resources": [
+    ],
+    "outputs": {
+    }
+}
