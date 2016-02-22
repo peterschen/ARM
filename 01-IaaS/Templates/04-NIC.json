@@ -2,7 +2,6 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-<<<<<<< HEAD
         "dnsPrefix": {
             "type": "string",
             "metadata": {
@@ -11,32 +10,21 @@
         }
     },
     "variables": {
-        "apiVersion": "2015-06-15"
-=======
-    },
-    "variables": {
->>>>>>> c6493ae... Added IaaS templates
+        "apiVersion": "2015-06-15",
         "location": "[resourceGroup().location]",
         "virtualNetworkName": "vnet",
         "virtualNetworkId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
         "subnetName": "subnet",
         "subnetId": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetName'))]",
-<<<<<<< HEAD
         "addressPrefix": "10.0.0.0/16",
         "subnetPrefix": "10.0.0.0/24",
         "publicIpName": "pip",
         "publicIpType": "Dynamic",
-        "nicName": "nic",
-=======
-        "publicIpName": "pip",
-        "nicName": "nic",
-        "apiVersion": "2015-06-15"
->>>>>>> c6493ae... Added IaaS templates
+        "nicName": "nic"
     },
     "resources": [
         {
             "apiVersion": "[variables('apiVersion')]",
-<<<<<<< HEAD
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('virtualNetworkName')]",
             "location": "[variables('location')]",
@@ -70,8 +58,6 @@
         },
         {
             "apiVersion": "[variables('apiVersion')]",
-=======
->>>>>>> c6493ae... Added IaaS templates
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicName')]",
             "location": "[variables('location')]",

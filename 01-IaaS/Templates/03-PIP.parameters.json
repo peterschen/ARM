@@ -3,11 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "dnsPrefix": {
-<<<<<<< HEAD
             "value": "at-01-iaas"
-=======
-            "value": "bmw-01-iaas"
->>>>>>> c6493ae... Added IaaS templates
         }
     }
 }

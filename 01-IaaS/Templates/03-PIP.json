@@ -10,17 +10,10 @@
         }
     },
     "variables": {
-<<<<<<< HEAD
         "apiVersion": "2015-06-15",
         "location": "[resourceGroup().location]",
         "publicIpName": "pip",
         "publicIpType": "Dynamic"
-=======
-        "location": "[resourceGroup().location]",
-        "publicIpName": "pip",
-        "publicIpType": "Dynamic",
-        "apiVersion": "2015-06-15"
->>>>>>> c6493ae... Added IaaS templates
     },
     "resources": [
         {

@@ -39,11 +39,7 @@
         "location": "[resourceGroup().location]",
         "imagePublisher": "MicrosoftWindowsServer",
         "imageOffer": "WindowsServer",
-<<<<<<< HEAD:01-IaaS/Templates/05-VM.json
         "storageAccountName": "[concat(uniquestring(resourceGroup().id))]",
-=======
-        "storageAccountName": "storage-[uniquestring(resourceGroup().id)]",
->>>>>>> c6493ae... Added IaaS templates:01-IaaS/Templates/05-VM.json
         "storageAccountType": "Standard_LRS",
         "storageAccountVmContainer": "vhds",
         "storageAccountUri": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net')]",
