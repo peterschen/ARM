@@ -2,11 +2,6 @@
 This project contains a Azure Resource Manager template which demonstrates template linkage and a simple decision tree to deploy identical resource types with different characteristics based on user input. 
 
 ## 03.01 Template Linkage & Decision Tree
-Change to the template directory
-```
-cd D:\20-Projects\ArmTemplates\03-AdvancedTemplateDesigns\Templates;
-```
-
 Create a new Resource Group in which to deploy the artifacts required for this template
 ```
 New-AzureRmResourceGroup -Name "ArmTemplates-03-AdvancedTemplateDesigns" `
@@ -17,8 +12,8 @@ New-AzureRmResourceGroup -Name "ArmTemplates-03-AdvancedTemplateDesigns" `
 Start the template deployment with a Template Parameter File
 ```
 New-AzureRmResourceGroupDeployment -Name "02-AdvancedTemplateDesigns-01-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\01.01-Master.json `
-    -TemplateParameterFile .\01.01-Master.parameters.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates/01.01-Master.json `
+    -TemplateParameterUri hhttps://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates/01.01-Master.parameters.json `
     -ResourceGroupName "ArmTemplates-03-AdvancedTemplateDesigns" `
     -Verbose;
 ```
@@ -26,7 +21,7 @@ New-AzureRmResourceGroupDeployment -Name "02-AdvancedTemplateDesigns-01-$(Get-Da
 Start the template deployment by passing required arguments
 ```
 New-AzureRmResourceGroupDeployment -Name "02-AdvancedTemplateDesigns-01-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\01.01-Master.json `
+    -TemplateFileUri https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates/01.01-Master.json `
     -ResourceGroupName "ArmTemplates-03-AdvancedTemplateDesigns" `
     -Verbose `
     

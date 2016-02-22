@@ -2,11 +2,6 @@
 This project contains a Azure Resource Manager template to deploy a PaaS application. 
 
 ## 02.01 Web App (Stand-Alone)
-Change to the template directory
-```
-cd D:\20-Projects\ArmTemplates\02-PaaS\Templates;
-```
-
 Create a new Resource Group in which to deploy the artifacts required for this template
 ```
 New-AzureRmResourceGroup -Name "ArmTemplates-02-PaaS" `
@@ -17,8 +12,8 @@ New-AzureRmResourceGroup -Name "ArmTemplates-02-PaaS" `
 Start the template deployment with a Template Parameter File
 ```
 $output = New-AzureRmResourceGroupDeployment -Name "02-PaaS-01-WebApp-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\01-WebApp.json `
-    -TemplateParameterFile .\01-WebApp.parameters.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/01-WebApp.json `
+    -TemplateParameterUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/01-WebApp.parameters.json `
     -ResourceGroupName "ArmTemplates-02-PaaS" `
     -Verbose;
 ```
@@ -32,7 +27,7 @@ Open a browser and display the installed site extionsions
 Start the template deployment by passing required arguments
 ```
 $output = New-AzureRmResourceGroupDeployment -Name "02-PaaS-01-WebApp-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\01-WebApp.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/01-WebApp.json `
     -ResourceGroupName "ArmTemplates-02-PaaS" `
     -Verbose `
     -webSiteName "at-02-paas"
@@ -45,11 +40,6 @@ Open a browser and display the installed site extionsions
 ```
 
 ## 02.02 SQL Database
-Change to the template directory
-```
-cd D:\20-Projects\ArmTemplates\02-PaaS\Templates;
-```
-
 Create a new Resource Group in which to deploy the artifacts required for this template
 ```
 New-AzureRmResourceGroup -Name "ArmTemplates-02-PaaS" `
@@ -60,8 +50,8 @@ New-AzureRmResourceGroup -Name "ArmTemplates-02-PaaS" `
 Start the template deployment with a Template Parameter File
 ```
 New-AzureRmResourceGroupDeployment -Name "02-PaaS-02-SQL-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\02-SQL.json `
-    -TemplateParameterFile .\02-SQL.parameters.json `
+    -TemplateUri https://github.com/peterschen/ARM/blob/master/02-PaaS/Templates/02-SQL.json `
+    -TemplateParameterUri https://github.com/peterschen/ARM/blob/master/02-PaaS/Templates/02-SQL.parameters.json `
     -ResourceGroupName "ArmTemplates-02-PaaS" `
     -Verbose;
 ```
@@ -70,7 +60,7 @@ Start the template deployment by passing required arguments
 ```
 $adminPassword = ConvertTo-SecureString -String "Admin123" -AsPlainText -Force;
 New-AzureRmResourceGroupDeployment -Name "02-PaaS-02-SQL-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\02-SQL.json `
+    -TemplateUri https://github.com/peterschen/ARM/blob/master/02-PaaS/Templates/02-SQL.json `
     -ResourceGroupName "ArmTemplates-02-PaaS" `
     -Verbose `
     -adminUsername "labadmin" `
@@ -79,11 +69,6 @@ New-AzureRmResourceGroupDeployment -Name "02-PaaS-02-SQL-$(Get-Date -Format "yyM
 ```
 
 ## 02.03 Web App (Tiered)
-Change to the template directory
-```
-cd D:\20-Projects\ArmTemplates\02-PaaS\Templates;
-```
-
 Create a new Resource Group in which to deploy the artifacts required for this template
 ```
 New-AzureRmResourceGroup -Name "ArmTemplates-02-PaaS" `
@@ -94,8 +79,8 @@ New-AzureRmResourceGroup -Name "ArmTemplates-02-PaaS" `
 Start the template deployment with a Template Parameter File
 ```
 $output = New-AzureRmResourceGroupDeployment -Name "02-PaaS-03-WebApp-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\03-WebApp.json `
-    -TemplateParameterFile .\03-WebApp.parameters.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/03-WebApp.json `
+    -TemplateParameterUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/03-WebApp.parameters.json `
     -ResourceGroupName "ArmTemplates-02-PaaS" `
     -Verbose;
 ```
@@ -109,7 +94,7 @@ Open a browser and display the installed site extionsions
 Start the template deployment by passing required arguments
 ```
 $output = New-AzureRmResourceGroupDeployment -Name "02-PaaS-03-WebApp-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateFile .\02-SQL.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/03-WebApp.json `
     -ResourceGroupName "ArmTemplates-02-PaaS" `
     -Verbose `
     -adminUsername "labadmin" `
