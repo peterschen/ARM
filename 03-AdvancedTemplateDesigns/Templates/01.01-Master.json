@@ -1,6 +1,6 @@
 ﻿{
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.1",
+    "contentVersion": "1.0.0.2",
     "parameters": {
         "serviceLevel": {
             "type": "string",
@@ -51,7 +51,7 @@
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
                     "uri": "[concat(variables('templateUriBase'), '/01.02-VM-', parameters('serviceLevel'), '.json')]",
-                    "contentVersion": "1.0.0.1"
+                    "contentVersion": "1.0.0.2"
                 },
                 "parameters": {
                     "location": {
