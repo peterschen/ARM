@@ -63,7 +63,7 @@
             "properties": {
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
-                    "uri": "[concat(parameters('templateUriBase'), '01.03-VM-Dependencies.json')]",
+                    "uri": "[concat(parameters('templateUriBase'), '/01.03-VM-Dependencies.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
