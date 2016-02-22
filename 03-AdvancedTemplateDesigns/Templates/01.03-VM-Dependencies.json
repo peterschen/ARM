@@ -1,6 +1,6 @@
 ﻿{
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.2",
+    "contentVersion": "1.0.0.3",
     "parameters": {
         "location": {
             "type": "string"
@@ -38,7 +38,7 @@
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
                     "uri": "[concat(parameters('templateUriBase'), '/01.04-Storage.json')]",
-                    "contentVersion": "1.0.0.2"
+                    "contentVersion": "1.0.0.3"
                 },
                 "parameters": {
                     "location": {
@@ -61,7 +61,7 @@
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
                     "uri": "[concat(parameters('templateUriBase'), '/01.05-VNet.json')]",
-                    "contentVersion": "1.0.0.2"
+                    "contentVersion": "1.0.0.3"
                 },
                 "parameters": {
                     "location": {
@@ -81,7 +81,7 @@
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
                     "uri": "[concat(parameters('templateUriBase'), '/01.06-PIP.json')]",
-                    "contentVersion": "1.0.0.2"
+                    "contentVersion": "1.0.0.3"
                 },
                 "parameters": {
                     "location": {
@@ -108,7 +108,7 @@
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
                     "uri": "[concat(parameters('templateUriBase'), '/01.07-NIC.json')]",
-                    "contentVersion": "1.0.0.2"
+                    "contentVersion": "1.0.0.3"
                 },
                 "parameters": {
                     "location": {

@@ -1,6 +1,6 @@
 ﻿{
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.2",
+    "contentVersion": "1.0.0.3",
     "parameters": {
         "serviceLevel": {
             "type": "string",
@@ -51,7 +51,7 @@
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
                     "uri": "[concat(variables('templateUriBase'), '/01.02-VM-', parameters('serviceLevel'), '.json')]",
-                    "contentVersion": "1.0.0.2"
+                    "contentVersion": "1.0.0.3"
                 },
                 "parameters": {
                     "location": {
@@ -82,10 +82,10 @@
                         "value": "[parameters('dnsPrefix')]"
                     },
                     "adminUsername": {
-                        "value": "string"
+                        "value": "[parameters('adminUsername')]"
                     },
                     "adminPassword": {
-                        "value": "securestring"
+                        "value": "[parameters('adminPassword')]"
                     }
                 }
             }

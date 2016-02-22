@@ -1,6 +1,6 @@
 ﻿{
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.2",
+    "contentVersion": "1.0.0.3",
     "parameters": {
         "location": {
             "type": "string"
@@ -61,7 +61,7 @@
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
                     "uri": "[concat(parameters('templateUriBase'), '/01.03-VM-Dependencies.json')]",
-                    "contentVersion": "1.0.0.2"
+                    "contentVersion": "1.0.0.3"
                 },
                 "parameters": {
                     "location": {
