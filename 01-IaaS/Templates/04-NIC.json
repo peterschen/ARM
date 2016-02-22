@@ -1,0 +1,102 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+<<<<<<< HEAD
+        "dnsPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique DNS prefix which will be used for the public IP to allow outside access to this VM."
+            }
+        }
+    },
+    "variables": {
+        "apiVersion": "2015-06-15"
+=======
+    },
+    "variables": {
+>>>>>>> c6493ae... Added IaaS templates
+        "location": "[resourceGroup().location]",
+        "virtualNetworkName": "vnet",
+        "virtualNetworkId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+        "subnetName": "subnet",
+        "subnetId": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetName'))]",
+<<<<<<< HEAD
+        "addressPrefix": "10.0.0.0/16",
+        "subnetPrefix": "10.0.0.0/24",
+        "publicIpName": "pip",
+        "publicIpType": "Dynamic",
+        "nicName": "nic",
+=======
+        "publicIpName": "pip",
+        "nicName": "nic",
+        "apiVersion": "2015-06-15"
+>>>>>>> c6493ae... Added IaaS templates
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion')]",
+<<<<<<< HEAD
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIpName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIpType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsPrefix')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+=======
+>>>>>>> c6493ae... Added IaaS templates
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIpName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetId')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

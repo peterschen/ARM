@@ -1,0 +1,147 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "databaseName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "webSiteName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for the Virtual Machine."
+            }
+        }
+    },
+    "variables": {
+        "apiVersion": "2015-08-01",
+        "apiVersionSql": "2014-04-01-preview",
+        "location": "[resourceGroup().location]",
+        "sqlServerName": "[concat('sqlserver-', uniqueString(resourceGroup().id))]",
+        "databaseCollation": "SQL_Latin1_General_CP1_CI_AS",
+        "databaseEdition": "Basic",
+        "databaseMaxSizeBytes": "1073741824",
+        "databasePricingTier": "Basic",
+        "hostingPlanName": "plan",
+        "hostingPlanPricingTier": "F1"
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersionSql')]",
+            "type": "Microsoft.Sql/servers",
+            "name": "[variables('sqlServerName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "administratorLogin": "[parameters('adminUsername')]",
+                "administratorLoginPassword": "[parameters('adminPassword')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersionSql')]",
+            "type": "Microsoft.Sql/servers/databases",
+            "name": "[concat(variables('sqlServerName'), '/', parameters('databaseName'))]",
+            "location": "[variables('location')]",
+            "kind": "v12.0",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
+            ],
+            "properties": {
+                "edition": "[variables('databaseEdition')]",
+                "collation": "[variables('databaseCollation')]",
+                "maxSizeBytes": "[variables('databaseMaxSizeBytes')]",
+                "requestedServiceObjectiveName": "[variables('databasePricingTier')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Web/serverfarms",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[variables('hostingPlanPricingTier')]"
+            },
+            "properties": {
+                "name": "[variables('hostingPlanName')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Web/sites",
+            "name": "[parameters('webSiteName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverFarms/', variables('hostingPlanName'))]"
+            ],
+            "properties": {
+                "name": "[parameters('webSiteName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+            },
+            "resources": [
+                {
+                    "apiVersion": "[variables('apiVersion')]",
+                    "type": "config",
+                    "name": "web",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('webSiteName'))]"
+                    ],
+                    "properties": {
+                        "appSettings": [
+                            {
+                                "Name": "SCM_SITEEXTENSIONS_FEED_URL",
+                                "Value": "http://www.siteextensions.net/api/v2/"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "apiVersion": "[variables('apiVersion')]",
+                    "type": "config",
+                    "name": "connectionstrings",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('webSiteName'))]"
+                    ],
+                    "properties": {
+                        "DefaultConnection": {
+                            "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('databaseName'), ';User Id=', parameters('adminUsername'), '@', variables('sqlServerName'), ';Password=', parameters('adminPassword'), ';')]",
+                            "type": "SQLServer"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "[variables('apiVersion')]",
+                    "type": "siteextensions",
+                    "name": "Monaco",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('webSiteName'))]",
+                        "[resourceId('Microsoft.Web/Sites/config', parameters('webSiteName'), 'web')]"
+                    ]
+                },
+                {
+                    "apiVersion": "[variables('apiVersion')]",
+                    "type": "siteextensions",
+                    "name": "filecountermvc",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('webSiteName'))]",
+                        "[resourceId('Microsoft.Web/Sites/config', parameters('webSiteName'), 'web')]"
+                    ]
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "url": {
+            "type": "string",
+            "value": "[concat('https://', parameters('webSiteName'), '.scm.azurewebsites.net')]"
+        }
+    }
+}

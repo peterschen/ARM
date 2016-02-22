@@ -1,0 +1,49 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+<<<<<<< HEAD
+        "apiVersion": "2015-06-15",
+=======
+>>>>>>> c6493ae... Added IaaS templates
+        "location": "[resourceGroup().location]",
+        "virtualNetworkName": "vnet",
+        "virtualNetworkId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+        "subnetName": "subnet",
+        "subnetId": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetName'))]",
+        "addressPrefix": "10.0.0.0/16",
+<<<<<<< HEAD
+        "subnetPrefix": "10.0.0.0/24"
+=======
+        "subnetPrefix": "10.0.0.0/24",
+        "apiVersion": "2015-06-15"
+>>>>>>> c6493ae... Added IaaS templates
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

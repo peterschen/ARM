@@ -1,0 +1,76 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for the Virtual Machine."
+            }
+        },
+        "databaseName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "apiVersion": "2014-04-01-preview",
+        "location": "[resourceGroup().location]",
+        "sqlServerName": "[concat('sqlserver-', uniqueString(resourceGroup().id))]",
+        "databaseCollation": "SQL_Latin1_General_CP1_CI_AS",
+        "databaseEdition": "Basic",
+        "databaseMaxSizeBytes": "1073741824",
+        "databasePricingTier": "Basic"
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Sql/servers",
+            "name": "[variables('sqlServerName')]",
+            "location": "[variables('location')]",
+            "kind": "v12.0",
+            "properties": {
+                "administratorLogin": "[parameters('adminUsername')]",
+                "administratorLoginPassword": "[parameters('adminPassword')]",
+                "version": "12.0"
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Sql/servers/databases",
+            "name": "[concat(variables('sqlServerName'), '/', parameters('databaseName'))]",
+            "location": "[variables('location')]",
+            "kind": "v12.0",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
+            ],
+            "properties": {
+                "edition": "[variables('databaseEdition')]",
+                "collation": "[variables('databaseCollation')]",
+                "maxSizeBytes": "[variables('databaseMaxSizeBytes')]",
+                "requestedServiceObjectiveName": "[variables('databasePricingTier')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Sql/servers/firewallrules",
+            "name": "[concat(variables('sqlServerName'), '/AllowAllWindowsAzureIps')]",
+            "location": "[resourceGroup().location]",
+            "kind": "v12.0",
+            "properties": {
+                "endIpAddress": "0.0.0.0",
+                "startIpAddress": "0.0.0.0"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
+            ]
+        }
+    ],
+    "outputs": {
+    }
+}

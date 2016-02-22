@@ -1,0 +1,94 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serviceLevel": {
+            "type": "string",
+            "allowedValues": [
+                "Gold",
+                "Diamond" 
+            ]
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "publicIpName": {
+            "type": "string"
+        },
+        "nicName": {
+            "type": "string"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "vmOsSku": {
+            "type": "string",
+            "allowedValues": [
+                "Windows-Server-Technical-Preview"
+            ]
+        },
+        "dnsPrefix": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "apiVersion": "",
+        "location": "[resourceGroup().location]",
+        "storageName": "[uniqueString(resourceGroup().id)]"
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "VM",
+            "location": "[variables('location')]",
+            "properties": {
+                "mode": "[deployment().properties.mode]",
+                "template": "[concat('01.02-VM-', parameters('serviceLevel'), '.json",
+                "parameters": {
+                    "apiVersion": {
+                        "value": "[variables('apiVersion')]"
+                    },
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "storageName": {
+                        "value": "[variables('storageName')]"
+                    },
+                    "vnetName": {
+                        "value": "[parameters('vnetName')]"
+                    },
+                    "publicIpName": {
+                        "value": "[parameters('publicIpName')]"
+                    },
+                    "nicName": {
+                        "value": "[parameters('nicName')]"
+                    },
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "vmOsSku": {
+                        "value": "[parameters('vmOsSku')]"
+                    },
+                    "dnsPrefix": {
+                        "value": "[parameters('dnsPrefix')]"
+                    },
+                    "adminUsername": {
+                        "value": "string"
+                    },
+                    "adminPassword": {
+                        "value": "securestring"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

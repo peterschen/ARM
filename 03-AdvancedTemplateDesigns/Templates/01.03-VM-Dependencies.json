@@ -1,0 +1,144 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiVersion": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "storageName": {
+            "type": "string"
+        },
+        "storageType": {
+            "type": "string"
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "publicIpName": {
+            "type": "string"
+        },
+        "nicName": {
+            "type": "string"
+        },
+        "dnsPrefix": {
+            "type": "string"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "apiVersion": "[parameters('apiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "Storage",
+            "location": "[parameters('location')]",
+            "properties": {
+                "mode": "[deployment().properties.mode]",
+                "template": "01.04-Storage.json",
+                "parameters": {
+                    "apiVersion": {
+                        "value": "[parameters('apiVersion')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "name": {
+                        "value": "[parameters('storageName')]"
+                    },
+                    "type": {
+                        "value": "[parameters('storageType')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "[parameters('apiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "VNet",
+            "location": "[parameters('location')]",
+            "properties": {
+                "mode": "[deployment().properties.mode]",
+                "template": "01.05-VNet.json",
+                "parameters": {
+                    "apiVersion": {
+                        "value": "[parameters('apiVersion')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "name": {
+                        "value": "[parameters('vnetName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "[parameters('apiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "PIP",
+            "location": "[parameters('location')]",
+            "properties": {
+                "mode": "[deployment().properties.mode]",
+                "template": "01.06-PIP.json",
+                "parameters": {
+                    "apiVersion": {
+                        "value": "[parameters('apiVersion')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "name": {
+                        "value": "[parameters('publicIpName')]"
+                    },
+                    "dnsPrefix": {
+                        "value": "[parameters('dnsPrefix')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "[parameters('apiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "name": "NIC",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'VNet')]",
+                "[resourceId('Microsoft.Resources/deployments', 'PIP')]"
+            ],
+            "properties": {
+                "mode": "[deployment().properties.mode]",
+                "template": "01.07-NIC.json",
+                "parameters": {
+                    "apiVersion": {
+                        "value": "[parameters('apiVersion')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "name": {
+                        "value": "[parameters('nicName')]"
+                    },
+                    "subnetId": {
+                        "value": "[reference('VNet').outputs.network.subnetId.value]"
+                    },
+                    "publicIpId": {
+                        "value": "[reference('PIP').outputs.publicIpId.value]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "nicId": {
+            "type": "string",
+            "value": "[reference('NIC').outputs.nicId.value]"
+        },
+        "storage": {
+            "type": "object",
+            "value": "[reference('Storage').outputs.storage.value]"
+        }
+    }
+}

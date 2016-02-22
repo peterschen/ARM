@@ -1,0 +1,38 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+<<<<<<< HEAD
+        "apiVersion": "2015-06-15",
+        "location": "[resourceGroup().location]",
+        "storageAccountName": "[concat(uniquestring(resourceGroup().id))]",
+        "storageAccountType": "Standard_LRS"
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+=======
+        "location": "[resourceGroup().location]",
+        "storageAccountName": "storage-[uniquestring(resourceGroup().id)]",
+        "storageAccountType": "Standard_LRS",
+        "apiVersion": "2015-06-15"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "[variables('apiVersion')]",
+>>>>>>> c6493ae... Added IaaS templates
+            "location": "[variables('location')]",
+            "properties": {
+                "accountType": "[variables('storageAccountType')]"
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

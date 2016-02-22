@@ -1,0 +1,22 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "value": "labadmin"
+        },
+        "adminPassword": {
+            "value": "Admin123"
+        },
+        "dnsPrefix": {
+<<<<<<< HEAD:01-IaaS/Templates/05-VM.parameters.json
+            "value": "at-01-iaas"
+=======
+            "value": "bmw-01-iaas"
+>>>>>>> c6493ae... Added IaaS templates:01-IaaS/Templates/05-VM.parameters.json
+        },
+        "windowsVersion": {
+            "value": "Windows-Server-Technical-Preview"
+        }
+    }
+}

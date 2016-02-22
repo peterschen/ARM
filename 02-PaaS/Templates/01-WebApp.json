@@ -1,0 +1,86 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "webSiteName": {
+            "type": "string",
+            "minLength": 1
+        }
+    },
+    "variables": {
+        "apiVersion": "2015-08-01",
+        "apiVersionSql": "2014-04-01-preview",
+        "location": "[resourceGroup().location]",
+        "hostingPlanName": "plan",
+        "hostingPlanPricingTier": "F1"
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Web/serverfarms",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[variables('hostingPlanPricingTier')]"
+            },
+            "properties": {
+                "name": "[variables('hostingPlanName')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "type": "Microsoft.Web/sites",
+            "name": "[parameters('webSiteName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverFarms/', variables('hostingPlanName'))]"
+            ],
+            "properties": {
+                "name": "[parameters('webSiteName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+            },
+            "resources": [
+                {
+                    "apiVersion": "[variables('apiVersion')]",
+                    "type": "config",
+                    "name": "web",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('webSiteName'))]"
+                    ],
+                    "properties": {
+                        "appSettings": [
+                            {
+                                "Name": "SCM_SITEEXTENSIONS_FEED_URL",
+                                "Value": "http://www.siteextensions.net/api/v2/"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "apiVersion": "[variables('apiVersion')]",
+                    "type": "siteextensions",
+                    "name": "Monaco",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('webSiteName'))]",
+                        "[resourceId('Microsoft.Web/Sites/config', parameters('webSiteName'), 'web')]"
+                    ]
+                },
+                {
+                    "apiVersion": "[variables('apiVersion')]",
+                    "type": "siteextensions",
+                    "name": "filecountermvc",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('webSiteName'))]",
+                        "[resourceId('Microsoft.Web/Sites/config', parameters('webSiteName'), 'web')]"
+                    ]
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "url": {
+            "type": "string",
+            "value": "[concat('https://', parameters('webSiteName'), '.scm.azurewebsites.net')]"
+        }
+    }
+}
