@@ -42,14 +42,8 @@
         "network": {
             "type": "object",
             "value": {
-                "id": {
-                    "type": "string",
-                    "value": "[resourceId('Microsoft.Network/virtualNetworks', parameters('name'))]"
-                },
-                "subnetId": {
-                    "type": "string",
-                    "value": "[variables('subnetId')]"
-                }
+                "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('name'))]",
+                "subnetId": "[variables('subnetId')]"
             }
         }
     }

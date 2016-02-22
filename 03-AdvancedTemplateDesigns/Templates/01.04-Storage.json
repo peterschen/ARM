@@ -30,14 +30,8 @@
         "storage": {
             "type": "object",
             "value": {
-                "uriBase": {
-                    "type": "string",
-                    "value": "[concat('https://', parameters('name'), '.blob.core.windows.net')]"
-                },
-                "uriVhdContainer": {
-                    "type": "string",
-                    "value": "[concat('https://', parameters('name'), '.blob.core.windows.net', '/vhds')]"
-                }
+                "uriBase": "[concat('https://', parameters('name'), '.blob.core.windows.net')]",
+                "uriVhdContainer": "[concat('https://', parameters('name'), '.blob.core.windows.net', '/vhds')]"
             }
         }
     }
