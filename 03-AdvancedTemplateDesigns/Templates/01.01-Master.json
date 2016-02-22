@@ -38,7 +38,7 @@
         }
     },
     "variables": {
-        "apiVersion": "2015-06-15",
+        "apiVersion": "2015-11-01",
         "location": "[resourceGroup().location]",
         "templateUriBase": "https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates",
         "storageName": "[uniqueString(resourceGroup().id)]"
