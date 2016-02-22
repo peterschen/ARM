@@ -51,7 +51,6 @@
             "apiVersion": "[parameters('apiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "name": "VM",
-            "location": "[parameters('location')]",
             "properties": {
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {

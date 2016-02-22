@@ -37,7 +37,6 @@
             "apiVersion": "[parameters('apiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "name": "Storage",
-            "location": "[parameters('location')]",
             "properties": {
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
@@ -64,7 +63,6 @@
             "apiVersion": "[parameters('apiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "name": "VNet",
-            "location": "[parameters('location')]",
             "properties": {
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
@@ -88,7 +86,6 @@
             "apiVersion": "[parameters('apiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "name": "PIP",
-            "location": "[parameters('location')]",
             "properties": {
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
@@ -115,7 +112,6 @@
             "apiVersion": "[parameters('apiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "name": "NIC",
-            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'VNet')]",
                 "[resourceId('Microsoft.Resources/deployments', 'PIP')]"

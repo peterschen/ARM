@@ -48,7 +48,6 @@
             "apiVersion": "[variables('apiVersion')]",
             "type": "Microsoft.Resources/deployments",
             "name": "VM",
-            "location": "[variables('location')]",
             "properties": {
                 "mode": "[deployment().properties.mode]",
                 "template": "[concat('01.02-VM-', parameters('serviceLevel'), '.json",
