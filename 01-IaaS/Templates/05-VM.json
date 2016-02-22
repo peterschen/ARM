@@ -35,7 +35,7 @@
         }
     },
     "variables": {
-        "apiVersion": "2015-06-15"
+        "apiVersion": "2015-06-15",
         "location": "[resourceGroup().location]",
         "imagePublisher": "MicrosoftWindowsServer",
         "imageOffer": "WindowsServer",
@@ -57,7 +57,7 @@
         "publicIpName": "pip",
         "publicIpType": "Dynamic",
         "vmName": "vm",
-        "vmSize": "Standard_D1",
+        "vmSize": "Standard_D1"
     },
     "resources": [
         {
