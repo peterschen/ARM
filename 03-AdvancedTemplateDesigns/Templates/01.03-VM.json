@@ -59,7 +59,7 @@
         {
             "apiVersion": "[parameters('apiVersion')]",
             "type": "Microsoft.Resources/deployments",
-            "name": "Dependencies",
+            "name": "VM-Dependencies",
             "properties": {
                 "mode": "[deployment().properties.mode]",
                 "templateLink": {
@@ -106,7 +106,7 @@
             "name": "[parameters('vmName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'VM')]"
+                "[resourceId('Microsoft.Resources/deployments', 'VM-Dependencies')]"
             ],
             "properties": {
                 "hardwareProfile": {
