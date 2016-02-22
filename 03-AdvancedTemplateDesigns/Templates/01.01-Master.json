@@ -6,7 +6,7 @@
             "type": "string",
             "allowedValues": [
                 "Gold",
-                "Diamond" 
+                "Diamond"
             ]
         },
         "vnetName": {
@@ -38,8 +38,9 @@
         }
     },
     "variables": {
-        "apiVersion": "",
+        "apiVersion": "2015-06-15",
         "location": "[resourceGroup().location]",
+        "templateUriBase": "https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates",
         "storageName": "[uniqueString(resourceGroup().id)]"
     },
     "resources": [
@@ -57,6 +58,9 @@
                     },
                     "location": {
                         "value": "[variables('location')]"
+                    },
+                    "templateUriBase": {
+                        "value": "[variables('templateUriBase')]"
                     },
                     "storageName": {
                         "value": "[variables('storageName')]"

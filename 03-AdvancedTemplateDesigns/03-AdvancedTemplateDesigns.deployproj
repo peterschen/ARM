@@ -36,7 +36,7 @@
     <Content Include="Templates\01.01-Master.json" />
     <Content Include="Templates\01.01-Master.parameters.json" />
     <None Include="Templates\01.03-VM-Dependencies.json" />
-    <None Include="Templates\01.03-VM-Generic.json" />
+    <None Include="Templates\01.03-VM.json" />
     <None Include="Templates\01.07-NIC.json" />
     <None Include="Templates\01.02-VM-Diamond.json" />
     <None Include="Templates\01.02-VM-Gold.json" />

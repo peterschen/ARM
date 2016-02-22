@@ -8,6 +8,9 @@
         "location": {
             "type": "string"
         },
+        "templateUriBase": {
+            "type": "string"
+        },
         "storageName": {
             "type": "string"
         },
@@ -51,7 +54,10 @@
             "location": "[parameters('location')]",
             "properties": {
                 "mode": "[deployment().properties.mode]",
-                "template": "01.03-VM-Dependencies.json",
+                "templateLink": {
+                    "uri": "[concat(parameters('templateUriBase'), '01.03-VM.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
                 "parameters": {
                     "apiVersion": {
                         "value": "[parameters('apiVersion')]"
