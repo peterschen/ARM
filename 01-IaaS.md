@@ -12,7 +12,7 @@ New-AzureRmResourceGroup -Name "ArmTemplates-01-IaaS" `
 Start the template deployment
 ```
 New-AzureRmResourceGroupDeployment -Name "01-IaaS-01-Storage-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateUri https://github.com/peterschen/ARM/blob/master/01-IaaS/Templates/01-Storage.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/01-IaaS/Templates/01-Storage.json `
     -ResourceGroupName "ArmTemplates-01-IaaS" `
     -Verbose;
 ```
