@@ -38,14 +38,13 @@
         }
     },
     "variables": {
-        "apiVersion": "2015-11-01",
         "location": "[resourceGroup().location]",
         "templateUriBase": "https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates",
         "storageName": "[uniqueString(resourceGroup().id)]"
     },
     "resources": [
         {
-            "apiVersion": "[variables('apiVersion')]",
+            "apiVersion": "2015-11-01",
             "type": "Microsoft.Resources/deployments",
             "name": "[concat('VM-', parameters('serviceLevel'))]",
             "properties": {
@@ -55,9 +54,6 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "apiVersion": {
-                        "value": "[variables('apiVersion')]"
-                    },
                     "location": {
                         "value": "[variables('location')]"
                     },

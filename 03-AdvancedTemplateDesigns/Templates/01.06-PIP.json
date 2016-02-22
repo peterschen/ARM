@@ -13,12 +13,11 @@
         }
     },
     "variables": {
-        "apiVersion": "2015-06-15",
         "publicIpType": "Dynamic"
     },
     "resources": [
         {
-            "apiVersion": "[variables('apiVersion')]",
+            "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[parameters('name')]",
             "location": "[parameters('location')]",

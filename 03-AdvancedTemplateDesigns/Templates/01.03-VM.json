@@ -2,9 +2,6 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "apiVersion": {
-            "type": "string"
-        },
         "location": {
             "type": "string"
         },
@@ -57,7 +54,7 @@
     },
     "resources": [
         {
-            "apiVersion": "[parameters('apiVersion')]",
+            "apiVersion": "2015-11-01",
             "type": "Microsoft.Resources/deployments",
             "name": "VM-Dependencies",
             "properties": {
@@ -67,9 +64,6 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "apiVersion": {
-                        "value": "[parameters('apiVersion')]"
-                    },
                     "location": {
                         "value": "[parameters('location')]"
                     },
@@ -98,7 +92,7 @@
             }
         },
         {
-            "apiVersion": "[parameters('apiVersion')]",
+            "apiVersion": "2015-06-15",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
             "location": "[parameters('location')]",

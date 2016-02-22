@@ -48,7 +48,7 @@
     },
     "resources": [
         {
-            "apiVersion": "[parameters('apiVersion')]",
+            "apiVersion": "2015-11-01",
             "type": "Microsoft.Resources/deployments",
             "name": "VM",
             "properties": {
@@ -58,9 +58,6 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "apiVersion": {
-                        "value": "[parameters('apiVersion')]"
-                    },
                     "location": {
                         "value": "[parameters('location')]"
                     },
