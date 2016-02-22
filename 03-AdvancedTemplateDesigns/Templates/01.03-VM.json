@@ -91,9 +91,6 @@
                     "nicName": {
                         "value": "[parameters('nicName')]"
                     },
-                    "vmName": {
-                        "value": "[parameters('vmName')]"
-                    },
                     "dnsPrefix": {
                         "value": "[parameters('dnsPrefix')]"
                     }
