@@ -73,6 +73,9 @@
                     "location": {
                         "value": "[parameters('location')]"
                     },
+                    "templateUriBase": {
+                        "value": "[parameters('templateUriBase')]"
+                    },
                     "storageName": {
                         "value": "[parameters('storageName')]"
                     },
