@@ -17,6 +17,6 @@ This solution is structured in projects, each covering a specific deployment typ
   * 02.01 Web App (Stand-alone)
   * 02.02 SQL Database
   * 02.03 Web App (Tiered)
-* 03 Service (Simple)
-* 04 Service (Complex)
-* 05 ???
+* [03 Advanced Template Designs](./03-AdvancedTemplateDesigns.md)
+  * 03.01 Template Linkage & Decision Tree
+* 04 Service
