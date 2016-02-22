@@ -133,11 +133,11 @@
             "value": "[reference('NIC').outputs.nicId.value]"
         },
         "storageUriBase": {
-            "type": "object",
+            "type": "string",
             "value": "[reference('Storage').outputs.storageUriBase.value]"
         },
         "storageUriVhdContainer": {
-            "type": "object",
+            "type": "string",
             "value": "[reference('Storage').outputs.storageUriVhdContainer.value]"
         }
     }
