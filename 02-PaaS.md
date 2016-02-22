@@ -50,8 +50,8 @@ New-AzureRmResourceGroup -Name "ArmTemplates-02-PaaS" `
 Start the template deployment with a Template Parameter File
 ```
 New-AzureRmResourceGroupDeployment -Name "02-PaaS-02-SQL-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateUri https://github.com/peterschen/ARM/blob/master/02-PaaS/Templates/02-SQL.json `
-    -TemplateParameterUri https://github.com/peterschen/ARM/blob/master/02-PaaS/Templates/02-SQL.parameters.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/02-SQL.json `
+    -TemplateParameterUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/02-SQL.parameters.json `
     -ResourceGroupName "ArmTemplates-02-PaaS" `
     -Verbose;
 ```
@@ -60,7 +60,7 @@ Start the template deployment by passing required arguments
 ```
 $adminPassword = ConvertTo-SecureString -String "Admin123" -AsPlainText -Force;
 New-AzureRmResourceGroupDeployment -Name "02-PaaS-02-SQL-$(Get-Date -Format "yyMMdd-Hs")" `
-    -TemplateUri https://github.com/peterschen/ARM/blob/master/02-PaaS/Templates/02-SQL.json `
+    -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/02-PaaS/Templates/02-SQL.json `
     -ResourceGroupName "ArmTemplates-02-PaaS" `
     -Verbose `
     -adminUsername "labadmin" `
