@@ -1,6 +1,6 @@
 ﻿{
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+    "contentVersion": "1.0.0.1",
     "parameters": {
         "serviceLevel": {
             "type": "string",
@@ -92,5 +92,31 @@
         }
     ],
     "outputs": {
+    }
+}
+
+{
+    "status": "Failed",
+    "error": {
+        "code": "ResourceDeploymentFailure",
+        "message": "The resource operation completed with terminal provisioning state 'Failed'.",
+        "details": [
+            {
+                "code": "DeploymentOutputEvaluationFailed",
+                "message": "Unable to evaluate template outputs: 'storageUriBase,storageUriVhdContainer'. Please see error details and deployment operations. Please see http://aka.ms/arm-debug for usage details.",
+                "details": [
+                    {
+                        "code": "DeploymentOutputEvaluationFailed",
+                        "target": "storageUriBase",
+                        "message": "The template output 'storageUriBase' is not valid: Index (zero based) must be greater than or equal to zero and less than the size of the argument list.."
+                    },
+                    {
+                        "code": "DeploymentOutputEvaluationFailed",
+                        "target": "storageUriVhdContainer",
+                        "message": "The template output 'storageUriVhdContainer' is not valid: Index (zero based) must be greater than or equal to zero and less than the size of the argument list.."
+                    }
+                ]
+            }
+        ]
     }
 }
