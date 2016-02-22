@@ -118,7 +118,7 @@
                         "value": "[parameters('nicName')]"
                     },
                     "subnetId": {
-                        "value": "[reference('VNet').outputs.network.value.subnetId]"
+                        "value": "[reference('VNet').outputs.networkSubnetId.value]"
                     },
                     "publicIpId": {
                         "value": "[reference('PIP').outputs.publicIpId.value]"
@@ -132,9 +132,13 @@
             "type": "string",
             "value": "[reference('NIC').outputs.nicId.value]"
         },
-        "storage": {
+        "storageUriBase": {
             "type": "object",
-            "value": "[reference('Storage').outputs.storage.value]"
+            "value": "[reference('Storage').outputs.storageUriBase.value]"
+        },
+        "storageUriVhdContainer": {
+            "type": "object",
+            "value": "[reference('Storage').outputs.storageUriVhdContainer.value]"
         }
     }
 }

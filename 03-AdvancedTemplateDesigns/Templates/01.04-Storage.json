@@ -27,12 +27,13 @@
         }
     ],
     "outputs": {
-        "storage": {
-            "type": "object",
-            "value": {
-                "uriBase": "[concat('https://', parameters('name'), '.blob.core.windows.net')]",
-                "uriVhdContainer": "[concat('https://', parameters('name'), '.blob.core.windows.net', '/vhds')]"
-            }
+        "storageUriBase": {
+            "type": "string",
+            "value": "[concat('https://', parameters('name'), '.blob.core.windows.net')]"
+        },
+        "storageUriVhdContainer": {
+            "type": "string",
+            "value": "[concat('https://', parameters('name'), '.blob.core.windows.net', '/vhds')]"
         }
     }
 }

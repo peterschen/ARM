@@ -118,7 +118,7 @@
                     "osDisk": {
                         "name": "[variables('osDiskName')]",
                         "vhd": {
-                            "uri": "[concat(reference('VM-Dependencies').outputs.storage.value.uriVhdContainer, '/', variables('osDiskName'), '.vhd')]"
+                            "uri": "[concat(reference('VM-Dependencies').outputs.storageUriVhdContainer.value, '/', variables('osDiskName'), '.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -129,7 +129,7 @@
                             "diskSizeGB": "50",
                             "lun": 0,
                             "vhd": {
-                                "uri": "[concat(reference('VM-Dependencies').outputs.storage.value.uriVhdContainer, '/', variables('dataDiskName'), '.vhd')]"
+                                "uri": "[concat(reference('VM-Dependencies').outputs.storageUriVhdContainer.value, '/', variables('dataDiskName'), '.vhd')]"
                             },
                             "createOption": "Empty"
                         }
@@ -145,7 +145,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": "true",
-                        "storageUri": "[reference('VM-Dependencies').outputs.storage.value.uriBase]"
+                        "storageUri": "[reference('VM-Dependencies').outputs.storageUriBase.value]"
                     }
                 }
             }

@@ -39,12 +39,13 @@
         }
     ],
     "outputs": {
-        "network": {
-            "type": "object",
-            "value": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('name'))]",
-                "subnetId": "[variables('subnetId')]"
-            }
-        }
+        "networkVnetId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Network/virtualNetworks', parameters('name'))]"
+        },
+        "networkSubnetId": {
+            "type": "string",
+            "value": "[variables('subnetId')]"
+        },
     }
 }
