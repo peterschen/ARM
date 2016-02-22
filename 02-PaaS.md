@@ -20,8 +20,8 @@ $output = New-AzureRmResourceGroupDeployment -Name "02-PaaS-01-WebApp-$(Get-Date
 
 Open a browser and display the installed site extionsions
 ```
-[System.Diagnostics.Process]::Start("$output.Outputs.url.Value/Dev/");
-[System.Diagnostics.Process]::Start("$output.Outputs.url.Value/filecounterMVC/");
+[System.Diagnostics.Process]::Start("$($output.Outputs.url.Value)/Dev/");
+[System.Diagnostics.Process]::Start("$($output.Outputs.url.Value)/filecounterMVC/");
 ```
 
 Start the template deployment by passing required arguments
@@ -35,8 +35,8 @@ $output = New-AzureRmResourceGroupDeployment -Name "02-PaaS-01-WebApp-$(Get-Date
 
 Open a browser and display the installed site extionsions
 ```
-[System.Diagnostics.Process]::Start("$output.Outputs.url.Value/Dev/");
-[System.Diagnostics.Process]::Start("$output.Outputs.url.Value/filecounterMVC/");
+[System.Diagnostics.Process]::Start("$($output.Outputs.url.Value)/Dev/");
+[System.Diagnostics.Process]::Start("$($output.Outputs.url.Value)/filecounterMVC/");;
 ```
 
 ## 02.02 SQL Database
