@@ -13,7 +13,7 @@ Start the template deployment with a Template Parameter File
 ```
 New-AzureRmResourceGroupDeployment -Name "02-AdvancedTemplateDesigns-01-$(Get-Date -Format "yyMMdd-Hs")" `
     -TemplateUri https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates/01.01-Master.json `
-    -TemplateParameterUri hhttps://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates/01.01-Master.parameters.json `
+    -TemplateParameterUri https://raw.githubusercontent.com/peterschen/ARM/master/03-AdvancedTemplateDesigns/Templates/01.01-Master.parameters.json `
     -ResourceGroupName "ArmTemplates-03-AdvancedTemplateDesigns" `
     -Verbose;
 ```
