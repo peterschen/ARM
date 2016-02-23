@@ -3,7 +3,7 @@ This project contains various examples which can be used for educational and dem
 
 This solution is structured in projects, each covering a specific deployment type or state. 
 
-* [00 Basics](./00-Basics.md)
+* [00 Fundamentals](./00-Fundamentals.md)
   * 00.01 Template semantics
   * 00.02 Template functions
   * 00.03 Template expressions
