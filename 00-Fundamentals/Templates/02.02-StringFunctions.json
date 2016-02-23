@@ -10,7 +10,7 @@
         "replace": "[replace('longstring', 'long', 'short')]",
         "trim": "[trim('   value')]",
         "toLower": "[toLower('SHOUTING!')]",
-        "toUpper": "[toLower('whispering')]"
+        "toUpper": "[toUpper('whispering')]"
     },
     "resources": [
     ],
