@@ -1,0 +1,272 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string",
+            "defaultValue": "West Europe",
+            "allowedValues": [
+                "West Europe",
+                "East US",
+                "Southeast Asia"
+            ],
+            "metadata": {
+                "description": "Specify the Azure Region for your OMS workspace"
+            }
+        },
+        "WorkspaceName": {
+            "type": "string"
+        },
+        "WorkspaceSubscriptionId": {
+            "type": "string"
+        },
+        "WorkspaceResourceGroupName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "workspaceId": "[concat('/subscriptions/', parameters('WorkspaceSubscriptionId'), '/resourceGroups/', parameters('WorkspaceResourceGroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('WorkspaceName'))]"
+    },
+    "resources": [
+        // OMS Data Source: Windows Security Event Log
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/Security')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsEvent",
+            "properties": {
+                "eventLogName": "Security",
+                "eventTypes": [
+                    {
+                        "eventType": "Error"
+                    },
+                    {
+                        "eventType": "Warning"
+                    },
+                    {
+                        "eventType": "Information"
+                    }
+                ]
+            }
+        },
+        // OMS Data Source: Windows System Event Log
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/System')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsEvent",
+            "properties": {
+                "eventLogName": "System",
+                "eventTypes": [
+                    {
+                        "eventType": "Error"
+                    },
+                    {
+                        "eventType": "Warning"
+                    },
+                    {
+                        "eventType": "Information"
+                    }
+                ]
+            }
+        },
+        // OMS Data Source: Windows Performance Counter
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-LDAvgDiskRead')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Avg. Disk sec/Read"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-LDAvgDiskWrite')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Avg. Disk sec/Write"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-LDCurDiskQueueLength')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Current Disk Queue Length"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-LDCurDiskRead')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Reads/sec"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-LDCurDiskTransfer')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Transfers/sec"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-LDCurDiskWrite')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Writes/sec"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-LDFreeMegabytes')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Free Megabytes"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-LDPercFreeSpace')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "% Free Space"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-MemoryAvailable')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Available MBytes"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-MemoryPercCommited')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "% Committed Bytes In Use"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-NicBytesRecd')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Received/sec"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-NicBytesSent')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Sent/sec"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-NicBytesTotal')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Total/sec"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-ProcessorTimeTotal')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Processor",
+                "instanceName": "_Total",
+                "intervalSeconds": 10,
+                "counterName": "% Processor Time"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('WorkspaceName'), '/OMS-ds-SystemProcQueueLength')]",
+            "location": "[parameters('Location')]",
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "System",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Processor Queue Length"
+            }
+        }
+    ]
+}
