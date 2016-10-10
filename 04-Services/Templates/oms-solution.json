@@ -1,0 +1,65 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string",
+            "defaultValue": "West Europe",
+            "allowedValues": [
+                "West Europe",
+                "East US",
+                "Southeast Asia"
+            ],
+            "metadata": {
+                "description": "Specify the Azure Region for your OMS workspace"
+            }
+        },
+        "WorkspaceName": {
+            "type": "string"
+        },
+        "WorkspaceSubscriptionId": {
+            "type": "string"
+        },
+        "WorkspaceResourceGroupName": {
+            "type": "string"
+        },
+        "SolutionName": {
+            "type": "string",
+            "allowedValues": [
+                "Security",
+                "ServiceFabric",
+                "AzureActivity",
+                "ApplicationInsights",
+                "AzureNetworking",
+                "AgentHealthAssessment"
+            ]
+        },
+        "PromotionCode": {
+            "type": "string",
+            "defaultValue": ""
+        }
+    },
+    "variables": {
+        "resourceGroupId": "[concat('/subscriptions/', parameters('WorkspaceSubscriptionId'), '/resourceGroups/', parameters('WorkspaceResourceGroupName'))]",
+        "workspaceId": "[concat(variables('resourceGroupId'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('WorkspaceName'))]",
+        "solutionName": "[concat(parameters('solutionName'), '(', parameters('WorkspaceName'), ')')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationsManagement/solutions",
+            "location": "[parameters('Location')]",
+            "name": "[variables('solutionName')]",
+            "id": "[concat(variables('resourceGroupId'), '/providers/Microsoft.OperationsManagement/solutions/', variables('SolutionName'))]",
+            "properties": {
+                "workspaceResourceId": "[variables('workspaceId')]"
+            },
+            "plan": {
+                "name": "[variables('SolutionName')]",
+                "publisher": "Microsoft",
+                "product": "[concat('OMSGallery/', parameters('solutionName'))]",
+                "promotionCode": "[parameters('PromotionCode')]"
+            }
+        }
+    ]
+}
