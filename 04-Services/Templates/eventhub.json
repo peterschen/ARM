@@ -1,0 +1,136 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string"
+        },
+        "Name": {
+            "type": "string"
+        },
+        "Sku": {
+            "type": "string",
+            "defaultValue": "Basic",
+            "allowedValues": [
+                "Basic"
+            ]
+        },
+        "Tier": {
+            "type": "string",
+            "defaultValue": "Basic",
+            "allowedValues": [
+                "Basic"
+            ]
+        },
+        "WorkspaceName": {
+            "type": "string"
+        },
+        "WorkspaceSubscriptionId": {
+            "type": "string"
+        },
+        "WorkspaceResourceGroupName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "defaultSasKeyName": "RootManageSharedAccessKey",
+        "workspaceId": "[concat('/subscriptions/', parameters('WorkspaceSubscriptionId'), '/resourceGroups/', parameters('WorkspaceResourceGroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('WorkspaceName'))]",
+        "authorizationRuleId": "[resourceId('Microsoft.EventHub/namespaces/authorizationRules', parameters('Name'), variables('defaultSasKeyName'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-08-01",
+            "type": "Microsoft.EventHub/namespaces",
+            "name": "[parameters('Name')]",
+            "location": "[parameters('Location')]",
+            "sku": {
+                "name": "[parameters('Sku')]",
+                "tier": "[parameters('Tier')]"
+            },
+            "properties": {
+                "serviceBusEndpoint": "[concat('https://', parameters('Name'),'.servicebus.windows.net:443/')]"
+            },
+            "resources": [
+                {
+                    "apiVersion": "2015-08-01",
+                    "type": "eventhubs",
+                    "name": "[concat('hub-', parameters('Name'))]",
+                    "location": "[parameters('Location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.EventHub/namespaces', parameters('Name'))]"
+                    ],
+                    "properties": {
+                        "messageRetentionInDays": 1,
+                        "partitionCount": 2
+                    }
+                },
+                {
+                    "apiVersion": "2015-07-01",
+                    "type": "providers/diagnosticSettings",
+                    "name": "Microsoft.Insights/service",
+                    "location": "[parameters('Location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.EventHub/namespaces', parameters('Name'))]"
+                    ],
+                    "properties": {
+                        "workspaceId": "[variables('workspaceId')]",
+                        "metrics": [
+                            {
+                                "timeGrain": "PT1M",
+                                "enabled": true,
+                                "retentionPolicy": {
+                                    "enabled": false,
+                                    "days": 0
+                                }
+                            }
+                        ],
+                        "logs": [
+                            {
+                                "category": "ArchiveLogs",
+                                "enabled": true,
+                                "retentionPolicy": {
+                                    "enabled": false,
+                                    "days": 0
+                                }
+                            },
+                            {
+                                "category": "OperationalLogs",
+                                "enabled": true,
+                                "retentionPolicy": {
+                                    "enabled": false,
+                                    "days": 0
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "apiVersion": "2015-08-01",
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "name": "[concat(parameters('Name'), '/', variables('defaultSasKeyName'))]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('Name'))]"
+            ]
+        }
+    ],
+    "outputs": {
+        "NamespaceConnectionString": {
+            "type": "string",
+            "value": "[listKeys(variables('authorizationRuleId'), '2015-08-01').primaryConnectionString]"
+        },
+        "SharedAccessPolicyPrimaryKey": {
+            "type": "string",
+            "value": "[listKeys(variables('authorizationRuleId'), '2015-08-01').primaryKey]"
+        }
+    }
+}
