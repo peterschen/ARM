@@ -1,0 +1,91 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string"
+        },
+        "Name": {
+            "type": "string"
+        },
+        "Sku": {
+            "type": "string",
+            "defaultValue": "F1",
+            "allowedValues": [
+                "F1"
+            ]
+        },
+        "Capacity": {
+            "type": "int",
+            "defaultValue": 1
+        },
+        "DeviceToCloudPartitions": {
+            "type": "int",
+            "defaultValue": 2
+        },
+        "Features": {
+            "type": "string",
+            "defaultValue": "",
+            "allowedValues": [
+                "",
+                "devicemanagement"
+            ]
+        },
+        "WorkspaceName": {
+            "type": "string"
+        },
+        "WorkspaceSubscriptionId": {
+            "type": "string"
+        },
+        "WorkspaceResourceGroupName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "workspaceId": "[concat('/subscriptions/', parameters('WorkspaceSubscriptionId'), '/resourceGroups/', parameters('WorkspaceResourceGroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('WorkspaceName'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2016-02-03",
+            "type": "Microsoft.Devices/IotHubs",
+            "name": "[parameters('Name')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "eventHubEndpoints": {
+                    "events": {
+                        "retentionTimeInDays": 1,
+                        "partitionCount": "[parameters('DeviceToCloudPartitions')]"
+                    }
+                },
+                "features": "[parameters('Features')]"
+            },
+            "sku": {
+                "name": "[parameters('Sku')]",
+                "capacity": "[parameters('Capacity')]"
+            },
+            "resources": [
+                {
+                    "type": "providers/diagnosticSettings",
+                    "name": "Microsoft.Insights/service",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Devices/IotHubs', parameters('Name'))]"
+                    ],
+                    "apiVersion": "2015-07-01",
+                    "properties": {
+                        "workspaceId": "[variables('workspaceId')]",
+                        "metrics": [
+                            {
+                                "timeGrain": "PT1M",
+                                "enabled": true,
+                                "retentionPolicy": {
+                                    "enabled": false,
+                                    "days": 0
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
