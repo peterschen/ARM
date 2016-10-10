@@ -1,0 +1,47 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string",
+            "defaultValue": "West Europe",
+            "allowedValues": [
+                "West Europe",
+                "East US",
+                "Southeast Asia"
+            ],
+            "metadata": {
+                "description": "Specify the Azure Region for your OMS workspace"
+            }
+        },
+        "WorkspaceName": {
+            "type": "string",
+            "defaultValue": "[uniqueString(resourceGroup().id)]",
+            "metadata": {
+                "description": "Name of your OMS Log Analytics Workspace"
+            }
+        },
+        "WorkspacePlan": {
+            "type": "string",
+            "defaultValue": "Free",
+            "allowedValues": [
+                "Free",
+                "Standard",
+                "Premium"
+            ]
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "name": "[parameters('WorkspaceName')]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "sku": {
+                    "name": "[parameters('WorkspacePlan')]"
+                }
+            }
+        }
+    ]
+}
