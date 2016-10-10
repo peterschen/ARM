@@ -34,8 +34,12 @@
       <Visible>False</Visible>
     </None>
     <Content Include="Scripts\Deploy-AzureResourceGroup.ps1" />
-    <Content Include="Templates\azuredeploy.json" />
-    <Content Include="Templates\azuredeploy.parameters.json" />
+    <Content Include="Templates\eventhub.json" />
+    <Content Include="Templates\iothub.json" />
+    <Content Include="Templates\loadbalancer.json" />
+    <Content Include="Templates\oms.json" />
+    <Content Include="Templates\oms-instrumentation.json" />
+    <Content Include="Templates\oms-solution.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Tools\AzCopy.exe" />
