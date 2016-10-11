@@ -224,11 +224,11 @@
                     "networkProfile": {
                         "networkInterfaceConfigurations": [
                             {
-                                "name": "[concat(variables('nicName'), '-0')]",
+                                "name": "[variables('nicName')]",
                                 "properties": {
                                     "ipConfigurations": [
                                         {
-                                            "name": "[concat(variables('nicName'), '-', 0)]",
+                                            "name": "[variables('nicName')]",
                                             "properties": {
                                                 "loadBalancerBackendAddressPools": [
                                                     {
@@ -266,10 +266,10 @@
                         "osDisk": {
                             "vhdContainers": [
                                 "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
-                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
-                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
-                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
-                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]"
+                                "[concat('https://', variables('vmStorageAccountName'), '1', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
+                                "[concat('https://', variables('vmStorageAccountName'), '2', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
+                                "[concat('https://', variables('vmStorageAccountName'), '3', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
+                                "[concat('https://', variables('vmStorageAccountName'), '4', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]"
                             ],
                             "name": "vmssosdisk",
                             "caching": "ReadOnly",
