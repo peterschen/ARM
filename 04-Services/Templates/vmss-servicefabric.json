@@ -15,6 +15,9 @@
         "Name": {
             "type": "string"
         },
+        "ServiceFabricClusterEndpoint": {
+            "type": "string"
+        },
         "LogStorageAccountName": {
             "type": "string"
         }
@@ -42,7 +45,7 @@
                                     },
                                     "publisher": "Microsoft.Azure.ServiceFabric",
                                     "settings": {
-                                        "clusterEndpoint": "[reference(parameters('Name')).clusterEndpoint]",
+                                        "clusterEndpoint": "[parameters('ServiceFabricClusterEndpoint')]",
                                         "nodeTypeRef": "[parameters('LogStorageAccountName')]",
                                         "dataPath": "D:\\\\SvcFab",
                                         "durabilityLevel": "Bronze"
