@@ -15,6 +15,10 @@
         "Name": {
             "type": "string"
         },
+        "LogStorageAccountName": {
+            "type": "string",
+            "defaultValue": "[concat('salog', uniqueString(parameters('Name'))]"
+        },
         "StorageAccountType": {
             "type": "string",
             "defaultValue": "Standard_LRS",
@@ -74,7 +78,7 @@
     "variables": {
         "vmStorageAccountName": "[concat('savm', uniqueString(parameters('Name')))]",
         "vmStorageAccountContainerName": "vhds",
-        "logStorageAccountName": "[concat('salog', uniqueString(parameters('Name')))]",
+        "logStorageAccountName": "[parameters('LogStorageAccountName')]",
         "diagStorageAccountName": "[concat('sadiag', uniqueString(parameters('Name')))]",
         "nicName": "[concat(parameters('Name'), '-nic')]",
         "workspaceReference": "[resourceId(parameters('WorkspaceSubscriptionId'), parameters('WorkspaceResourceGroupName'), 'Microsoft.OperationalInsights/workspaces', parameters('WorkspaceName'))]"
@@ -133,25 +137,6 @@
                 "virtualMachineProfile": {
                     "extensionProfile": {
                         "extensions": [
-                            /*{
-                                "name": "[concat(parameters('Name'), '-ServiceFabric')]",
-                                "properties": {
-                                    "type": "ServiceFabricNode",
-                                    "autoUpgradeMinorVersion": false,
-                                    "protectedSettings": {
-                                        "StorageAccountKey1": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName')), '2015-06-15').key1]",
-                                        "StorageAccountKey2": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName')), '2015-06-15').key2]"
-                                    },
-                                    "publisher": "Microsoft.Azure.ServiceFabric",
-                                    "settings": {
-                                        "clusterEndpoint": "[reference(parameters('clusterName')).clusterEndpoint]",
-                                        "nodeTypeRef": "[parameters('Name')]",
-                                        "dataPath": "D:\\\\SvcFab",
-                                        "durabilityLevel": "Bronze"
-                                    },
-                                    "typeHandlerVersion": "1.0"
-                                }
-                            }*/,
                             {
                                 "name": "[concat(parameters('Name'),'-')]",
                                 "properties": {
