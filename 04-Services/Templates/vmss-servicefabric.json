@@ -1,0 +1,71 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string",
+            "defaultValue": "West Europe",
+            "allowedValues": [
+                "North Europe",
+                "West Europe",
+                "East US",
+                "Southeast Asia"
+            ]
+        },
+        "Name": {
+            "type": "string"
+        },
+        "LogStorageAccountName": {
+            "type": "string"
+        },
+        "WorkspaceName": {
+            "type": "string"
+        },
+        "WorkspaceSubscriptionId": {
+            "type": "string"
+        },
+        "WorkspaceResourceGroupName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Compute/virtualMachineScaleSet",
+            "name": "[parameters('Name')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-virtualMachineScaleSet')]"
+            ],
+            "properties": {
+                "virtualMachineProfile": {
+                    "extensionProfile": {
+                        "extensions": [
+                            {
+                                "name": "[concat(parameters('Name'), '-ServiceFabric')]",
+                                "properties": {
+                                    "type": "ServiceFabricNode",
+                                    "autoUpgradeMinorVersion": false,
+                                    "protectedSettings": {
+                                        "StorageAccountKey1": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('LogStorageAccountName')), '2015-06-15').key1]",
+                                        "StorageAccountKey2": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('LogStorageAccountName')), '2015-06-15').key2]"
+                                    },
+                                    "publisher": "Microsoft.Azure.ServiceFabric",
+                                    "settings": {
+                                        "clusterEndpoint": "[reference(parameters('Name')).clusterEndpoint]",
+                                        "nodeTypeRef": "[parameters('LogStorageAccountName')]",
+                                        "dataPath": "D:\\\\SvcFab",
+                                        "durabilityLevel": "Bronze"
+                                    },
+                                    "typeHandlerVersion": "1.0"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
