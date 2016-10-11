@@ -26,8 +26,8 @@
     },
     "resources": [
         {
-            "apiVersion": "2016-03-30",
-            "type": "Microsoft.Compute/virtualMachineScaleSet",
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
             "name": "[parameters('Name')]",
             "location": "[parameters('Location')]",
             "properties": {
