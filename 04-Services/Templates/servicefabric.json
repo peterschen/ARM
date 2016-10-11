@@ -1,0 +1,279 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string"
+        },
+        "Name": {
+            "type": "string"
+        },
+        "DnsName": {
+            "type": "string"
+        },
+        "StorageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS"
+            ]
+        },
+        "VmssAdminUsername": {
+            "type": "string"
+        },
+        "VmssAdminPassword": {
+            "type": "securestring"
+        },
+        "VmssVmImageVersion": {
+            "type": "string",
+            "defaultValue": "latest"
+        },
+        "VmssVmImageSku": {
+            "type": "string",
+            "defaultValue": "2012-R2-Datacenter"
+        },
+        "VmssVmImageOffer": {
+            "type": "string",
+            "defaultValue": "WindowsServer"
+        },
+        "VmssVmImagePublisher": {
+            "type": "string",
+            "defaultValue": "MicrosoftWindowsServer"
+        },
+        "VmssVmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D1_v2"
+        },
+        "VmssOverProvision": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "WorkspaceName": {
+            "type": "string"
+        },
+        "WorkspaceSubscriptionId": {
+            "type": "string"
+        },
+        "WorkspaceResourceGroupName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "applicationStartPort": 20000,
+        "applicationEndPort": 30000,
+        "ephemeralStartPort": 49152,
+        "ephemeralEndPort": 65534,
+        "serviceFabricTcpGatewayPort": 19000,
+        "serviceFabricHttpGatewayPort": 19080,
+        "logStorageAccountName": "[concat('salog', uniqueString(parameters('Name')))]",
+        "virtualMachineScaleSetName": "[concat(parameters('Name'), '-vmss')]",
+        "loadBalancerName": "[concat(parameters('Name'), '-lb')]",
+        "workspaceId": "[concat('/subscriptions/', parameters('WorkspaceSubscriptionId'), '/resourceGroups/', parameters('WorkspaceResourceGroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('WorkspaceName'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('logStorageAccountName')]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "accountType": "[parameters('StorageAccountType')]"
+            }
+        },
+        {
+            "apiVersion": "2015-01-01",
+            "name": "ServiceFabric-LoadBalancer",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/peterschen/ARM/master/04-Services/Templates/loadbalancer.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "Location": {
+                        "value": "[parameters('Location')]"
+                    },
+                    "Name": {
+                        "value": "[variables('loadBalancerName')]"
+                    },
+                    "DnsName": {
+                        "value": "[parameters('DnsName')]"
+                    },
+                    "WorkspaceName": {
+                        "value": "[parameters('WorkspaceName')]"
+                    },
+                    "WorkspaceSubscriptionId": {
+                        "value": "[parameters('WorkspaceSubscriptionId')]"
+                    },
+                    "WorkspaceResourceGroupName": {
+                        "value": "[parameters('WorkspaceResourceGroupName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2015-01-01",
+            "name": "ServiceFabric-virtualMachineScaleSet",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-LoadBalancer')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/peterschen/ARM/master/04-Services/Templates/vmss.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "Location": {
+                        "value": "[parameters('Location')]"
+                    },
+                    "Name": {
+                        "value": "[variables('virtualMachineScaleSetName')]"
+                    },
+                    "StorageAccountType": {
+                        "value": "[parameters('StorageAccountType')]"
+                    },
+                    "LogStorageAccountName": {
+                        "value": "[variables('logStorageAccountName')]"
+                    },
+                    "AdminUsername": {
+                        "value": "[parameters('VmssAdminUsername')]"
+                    },
+                    "AdminPassword": {
+                        "value": "[parameters('VmssAdminPassword')]"
+                    },
+                    "VmImageVersion": {
+                        "value": "[parameters('VmssVmImageVersion')]"
+                    },
+                    "VmImageSku": {
+                        "value": "[parameters('VmssVmImageSku')]"
+                    },
+                    "VmImageOffer": {
+                        "value": "[parameters('VmssVmImageOffer')]"
+                    },
+                    "VmImagePublisher": {
+                        "value": "[parameters('VmssVmImagePublisher')]"
+                    },
+                    "VmSize": {
+                        "value": "[parameters('VmssVmSize')]"
+                    },
+                    "OverProvision": {
+                        "value": "[parameters('VmssOverProvision')]"
+                    },
+                    "LoadBalancerBackendAddressPoolId": {
+                        "value": "[reference('ServiceFabric-LoadBalancer').outputs.BackendAddressPoolId.value]"
+                    },
+                    "LoadBalancerInboundNatPoolId": {
+                        "value": "[reference('ServiceFabric-LoadBalancer').outputs.InboundNatPoolId.value]"
+                    },
+                    "LoadBalancerSubnetId": {
+                        "value": "[reference('ServiceFabric-LoadBalancer').outputs.SubnetId.value]"
+                    },
+                    "WorkspaceName": {
+                        "value": "[parameters('WorkspaceName')]"
+                    },
+                    "WorkspaceSubscriptionId": {
+                        "value": "[parameters('WorkspaceSubscriptionId')]"
+                    },
+                    "WorkspaceResourceGroupName": {
+                        "value": "[parameters('WorkspaceResourceGroupName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2015-01-01",
+            "name": "ServiceFabric-virtualMachineScaleSet-Extension",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-LoadBalancer')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/peterschen/ARM/master/04-Services/Templates/vmss-servicefabric.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "Location": {
+                        "value": "[parameters('Location')]"
+                    },
+                    "Name": {
+                        "value": "[variables('virtualMachineScaleSetName')]"
+                    },
+                    "LogStorageAccountName": {
+                        "value": "[variables('logStorageAccountName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2016-03-01",
+            "type": "Microsoft.ServiceFabric/clusters",
+            "name": "[parameters('Name')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName'))]",
+                "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-VirtualMachineScaleSet')]",
+                "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-VirtualMachineScaleSet-Extension')]"
+            ],
+            "properties": {
+                "clientCertificateCommonNames": [],
+                "clientCertificateThumbprints": [],
+                "clusterState": "Default",
+                "diagnosticsStorageAccountConfig": {
+                    "blobEndpoint": "[concat('https://', variables('logStorageAccountName'), '.blob.core.windows.net/')]",
+                    "protectedAccountKeyName": "StorageAccountKey1",
+                    "queueEndpoint": "[concat('https://', variables('logStorageAccountName'), '.queue.core.windows.net/')]",
+                    "storageAccountName": "[variables('logStorageAccountName')]",
+                    "tableEndpoint": "[concat('https://', variables('logStorageAccountName'), '.table.core.windows.net/')]"
+                },
+                "fabricSettings": [],
+                "managementEndpoint": "[concat('http://', reference('ServiceFabric-LoadBalancer').outputs.Fqdn.value, ':', variables('serviceFabricHttpGatewayPort'))]",
+                "nodeTypes": [
+                    {
+                        "name": "[variables('virtualMachineScaleSetName')]",
+                        "applicationPorts": {
+                            "startPort": "[variables('applicationStartPort')]",
+                            "endPort": "[variables('applicationEndPort')]"
+                        },
+                        "clientConnectionEndpointPort": "[variables('serviceFabricTcpGatewayPort')]",
+                        "durabilityLevel": "Bronze",
+                        "ephemeralPorts": {
+                            "startPort": "[variables('ephemeralStartPort')]",
+                            "endPort": "[variables('ephemeralEndPort')]"
+                        },
+                        "httpGatewayEndpointPort": "[variables('serviceFabricHttpGatewayPort')]",
+                        "isPrimary": true,
+                        "vmInstanceCount": 5
+                    }
+                ],
+                "provisioningState": "Default",
+                "reliabilityLevel": "Silver",
+                "vmImage": "Windows"
+            }
+        },
+        {
+          "apiVersion": "2015-11-01-preview",
+          "type": "Microsoft.OperationalInsights/workspaces/storageinsightconfigs",
+          "name": "[concat(parameters('WorkspaceName'), '/DataSource-', variables('logStorageAccountName'))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName'))]"
+          ],
+          "properties": {
+            "containers": [ ],
+            "tables": [
+              "WADServiceFabric*EventTable",
+              "WADWindowsEventLogsTable",
+              "WADETWEventTable"
+            ],
+            "storageAccount": {
+              "id": "[resourceId('Microsoft.Storage/storageaccounts', variables('logStorageAccountName'))]",
+              "key": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName')),'2015-06-15').key1]"
+            }
+          }
+        }
+    ]
+}
