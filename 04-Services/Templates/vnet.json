@@ -15,6 +15,10 @@
         "Name": {
             "type": "string"
         },
+        "AddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
+        },
         "Subnets": {
             "type": "array",
             "defaultValue": [
@@ -25,10 +29,6 @@
                     }
                 }
             ]
-        },
-        "AddressPrefix": {
-            "type": "string",
-            "defaultValue": "10.0.0.0/16"
         }
     },
     "variables": {
