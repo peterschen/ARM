@@ -212,4 +212,4 @@ _Pvt_Extensions/
 ModelManifest.xml
 
 # Custom exclusions
-oms.parameters.json
+*.parameters.json
