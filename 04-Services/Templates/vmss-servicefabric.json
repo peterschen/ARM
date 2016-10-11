@@ -17,15 +17,6 @@
         },
         "LogStorageAccountName": {
             "type": "string"
-        },
-        "WorkspaceName": {
-            "type": "string"
-        },
-        "WorkspaceSubscriptionId": {
-            "type": "string"
-        },
-        "WorkspaceResourceGroupName": {
-            "type": "string"
         }
     },
     "variables": {
