@@ -27,9 +27,6 @@
             "type": "Microsoft.Compute/virtualMachineScaleSet",
             "name": "[parameters('Name')]",
             "location": "[parameters('Location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-virtualMachineScaleSet')]"
-            ],
             "properties": {
                 "virtualMachineProfile": {
                     "extensionProfile": {
