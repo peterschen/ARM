@@ -229,78 +229,80 @@
                 }
             }
         },
-        // {
-        //     "apiVersion": "2015-01-01",
-        //     "name": "ServiceFabric-virtualMachineScaleSet-Extension",
-        //     "type": "Microsoft.Resources/deployments",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-VirtualMachineScaleSet')]"
-        //     ],
-        //     "properties": {
-        //         "mode": "Incremental",
-        //         "templateLink": {
-        //             "uri": "https://raw.githubusercontent.com/peterschen/ARM/master/04-Services/Templates/vmss-servicefabric.json",
-        //             "contentVersion": "1.0.0.0"
-        //         },
-        //         "parameters": {
-        //             "Location": {
-        //                 "value": "[parameters('Location')]"
-        //             },
-        //             "Name": {
-        //                 "value": "[variables('virtualMachineScaleSetName')]"
-        //             },
-        //             "LogStorageAccountName": {
-        //                 "value": "[variables('logStorageAccountName')]"
-        //             }
-        //         }
-        //     }
-        // },
-        // {
-        //     "apiVersion": "2016-03-01",
-        //     "type": "Microsoft.ServiceFabric/clusters",
-        //     "name": "[parameters('Name')]",
-        //     "location": "[parameters('Location')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName'))]",
-        //         "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-VirtualMachineScaleSet')]",
-        //         "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-VirtualMachineScaleSet-Extension')]"
-        //     ],
-        //     "properties": {
-        //         "clientCertificateCommonNames": [],
-        //         "clientCertificateThumbprints": [],
-        //         "clusterState": "Default",
-        //         "diagnosticsStorageAccountConfig": {
-        //             "blobEndpoint": "[concat('https://', variables('logStorageAccountName'), '.blob.core.windows.net/')]",
-        //             "protectedAccountKeyName": "StorageAccountKey1",
-        //             "queueEndpoint": "[concat('https://', variables('logStorageAccountName'), '.queue.core.windows.net/')]",
-        //             "storageAccountName": "[variables('logStorageAccountName')]",
-        //             "tableEndpoint": "[concat('https://', variables('logStorageAccountName'), '.table.core.windows.net/')]"
-        //         },
-        //         "fabricSettings": [],
-        //         "managementEndpoint": "[concat('http://', reference('ServiceFabric-LoadBalancer').outputs.Fqdn.value, ':', variables('serviceFabricHttpGatewayPort'))]",
-        //         "nodeTypes": [
-        //             {
-        //                 "name": "[variables('virtualMachineScaleSetName')]",
-        //                 "applicationPorts": {
-        //                     "startPort": "[variables('applicationStartPort')]",
-        //                     "endPort": "[variables('applicationEndPort')]"
-        //                 },
-        //                 "clientConnectionEndpointPort": "[variables('serviceFabricTcpGatewayPort')]",
-        //                 "durabilityLevel": "Bronze",
-        //                 "ephemeralPorts": {
-        //                     "startPort": "[variables('ephemeralStartPort')]",
-        //                     "endPort": "[variables('ephemeralEndPort')]"
-        //                 },
-        //                 "httpGatewayEndpointPort": "[variables('serviceFabricHttpGatewayPort')]",
-        //                 "isPrimary": true,
-        //                 "vmInstanceCount": 5
-        //             }
-        //         ],
-        //         "provisioningState": "Default",
-        //         "reliabilityLevel": "Silver",
-        //         "vmImage": "Windows"
-        //     }
-        // },
+        {
+            "apiVersion": "2016-03-01",
+            "type": "Microsoft.ServiceFabric/clusters",
+            "name": "[parameters('Name')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName'))]"
+            ],
+            "properties": {
+                "clientCertificateCommonNames": [],
+                "clientCertificateThumbprints": [],
+                "clusterState": "Default",
+                "diagnosticsStorageAccountConfig": {
+                    "blobEndpoint": "[concat('https://', variables('logStorageAccountName'), '.blob.core.windows.net/')]",
+                    "protectedAccountKeyName": "StorageAccountKey1",
+                    "queueEndpoint": "[concat('https://', variables('logStorageAccountName'), '.queue.core.windows.net/')]",
+                    "storageAccountName": "[variables('logStorageAccountName')]",
+                    "tableEndpoint": "[concat('https://', variables('logStorageAccountName'), '.table.core.windows.net/')]"
+                },
+                "fabricSettings": [],
+                "managementEndpoint": "[concat('http://', reference('ServiceFabric-LoadBalancer').outputs.Fqdn.value, ':', variables('serviceFabricHttpGatewayPort'))]",
+                "nodeTypes": [
+                    {
+                        "name": "[variables('virtualMachineScaleSetName')]",
+                        "applicationPorts": {
+                            "startPort": "[variables('applicationStartPort')]",
+                            "endPort": "[variables('applicationEndPort')]"
+                        },
+                        "clientConnectionEndpointPort": "[variables('serviceFabricTcpGatewayPort')]",
+                        "durabilityLevel": "Bronze",
+                        "ephemeralPorts": {
+                            "startPort": "[variables('ephemeralStartPort')]",
+                            "endPort": "[variables('ephemeralEndPort')]"
+                        },
+                        "httpGatewayEndpointPort": "[variables('serviceFabricHttpGatewayPort')]",
+                        "isPrimary": true,
+                        "vmInstanceCount": 5
+                    }
+                ],
+                "provisioningState": "Default",
+                "reliabilityLevel": "Silver",
+                "vmImage": "Windows"
+            }
+        },
+        {
+            "apiVersion": "2015-01-01",
+            "name": "ServiceFabric-virtualMachineScaleSet-Extension",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'ServiceFabric-VirtualMachineScaleSet')]",
+                "[resourceId('Microsoft.ServiceFabric/clusters', parameters('Name'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/peterschen/ARM/master/04-Services/Templates/vmss-servicefabric.json",
+                    "contentVersion": "1.0.0.2"
+                },
+                "parameters": {
+                    "Location": {
+                        "value": "[parameters('Location')]"
+                    },
+                    "Name": {
+                        "value": "[variables('virtualMachineScaleSetName')]"
+                    },
+                    "ServiceFabricClusterEndpoint": {
+                        "value": "[reference(parameters('Name')).clusterEndpoint]"
+                    },
+                    "LogStorageAccountName": {
+                        "value": "[variables('logStorageAccountName')]"
+                    }
+                }
+            }
+        },
         // {
         //   "apiVersion": "2015-11-01-preview",
         //   "type": "Microsoft.OperationalInsights/workspaces/storageinsightconfigs",
