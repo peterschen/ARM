@@ -31,6 +31,8 @@
             "name": "[parameters('Name')]",
             "location": "[parameters('Location')]",
             "properties": {
+                "overprovision": "[reference(resourceId('Microsoft.Compute/virtualMachineScaleSet', parameters('Name'))).overprovision]",
+                "upgradePolicy": "[reference(resourceId('Microsoft.Compute/virtualMachineScaleSet', parameters('Name'))).upgradePolicy]",
                 "virtualMachineProfile": {
                     "extensionProfile": {
                         "extensions": [
@@ -55,7 +57,10 @@
                             }
                         ]
                     }
-                }
+                },
+                "networkProfile": "[reference(resourceId('Microsoft.Compute/virtualMachineScaleSet', parameters('Name'))).networkProfile]",
+                "osProfile": "[reference(resourceId('Microsoft.Compute/virtualMachineScaleSet', parameters('Name'))).osProfile]",
+                "storageProfile": "[reference(resourceId('Microsoft.Compute/virtualMachineScaleSet', parameters('Name'))).storageProfile]"
             }
         }
     ]
