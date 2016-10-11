@@ -1,0 +1,52 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string",
+            "defaultValue": "West Europe",
+            "allowedValues": [
+                "North Europe",
+                "West Europe",
+                "East US",
+                "Southeast Asia"
+            ]
+        },
+        "Name": {
+            "type": "string"
+        },
+        "Subnets": {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "name": "subnet0",
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/24"
+                    }
+                }
+            ]
+        },
+        "AddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('Name')]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('AddressPrefix')]"
+                    ]
+                },
+                "subnets": "[parameters('Subnets')]"
+            }
+        }
+    ]
+}
