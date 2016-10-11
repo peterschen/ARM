@@ -116,7 +116,7 @@
             }
         },
         {
-            "apiVersion": "2016-03-30",
+            "apiVersion": "2015-06-15",
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "name": "[parameters('Name')]",
             "location": "[parameters('Location')]",
@@ -239,7 +239,7 @@
                     "osProfile": {
                         "adminPassword": "[parameters('AdminPassword')]",
                         "adminUsername": "[parameters('AdminUsername')]",
-                        "computernamePrefix": "[parameters('Name')]"
+                        "computerNamePrefix": "[parameters('Name')]"
                     },
                     "storageProfile": {
                         "imageReference": {
