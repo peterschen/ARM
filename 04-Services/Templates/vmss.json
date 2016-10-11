@@ -1,0 +1,288 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string",
+            "defaultValue": "West Europe",
+            "allowedValues": [
+                "North Europe",
+                "West Europe",
+                "East US",
+                "Southeast Asia"
+            ]
+        },
+        "Name": {
+            "type": "string"
+        },
+        "StorageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS"
+            ]
+        },
+        "AdminUsername": {
+            "type": "string"
+        },
+        "AdminPassword": {
+            "type": "securestring"
+        },
+        "VmImageVersion": {
+            "type": "string",
+            "defaultValue": "latest"
+        },
+        "VmImageSku": {
+            "type": "string",
+            "defaultValue": "2012-R2-Datacenter"
+        },
+        "VmImageOffer": {
+            "type": "string",
+            "defaultValue": "WindowsServer"
+        },
+        "VmImagePublisher": {
+            "type": "string",
+            "defaultValue": "MicrosoftWindowsServer"
+        },
+        "VmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D1_v2"
+        },
+        "OverProvision": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "LoadBalancerBackendAddressPoolId": {
+            "type": "string"
+        },
+        "LoadBalancerInboundNatPoolId": {
+            "type": "string"
+        },
+        "LoadBalancerSubnetId": {
+            "type": "string"
+        },
+        "WorkspaceName": {
+            "type": "string"
+        },
+        "WorkspaceSubscriptionId": {
+            "type": "string"
+        },
+        "WorkspaceResourceGroupName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vmStorageAccountName": "[concat('savm', uniqueString(parameters('Name')))]",
+        "vmStorageAccountContainerName": "vhds",
+        "logStorageAccountName": "[concat('salog', uniqueString(parameters('Name')))]",
+        "diagStorageAccountName": "[concat('sadiag', uniqueString(parameters('Name')))]",
+        "nicName": "[concat(parameters('Name'), '-nic')]",
+        "workspaceReference": "[resourceId(parameters('WorkspaceSubscriptionId'), parameters('WorkspaceResourceGroupName'), 'Microsoft.OperationalInsights/workspaces', parameters('WorkspaceName'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[concat(variables('vmStorageAccountName'), copyIndex())]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "accountType": "[parameters('StorageAccountType')]"
+            },
+            "copy": {
+                "name": "storageLoop",
+                "count": 5
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('logStorageAccountName')]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "accountType": "[parameters('StorageAccountType')]"
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('diagStorageAccountName')]",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "accountType": "[parameters('StorageAccountType')]"
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "name": "[parameters('Name')]",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', concat(variables('vmStorageAccountName'), '0'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', concat(variables('vmStorageAccountName'), '1'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', concat(variables('vmStorageAccountName'), '2'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', concat(variables('vmStorageAccountName'), '3'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', concat(variables('vmStorageAccountName'), '4'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('diagStorageAccountName'))]"
+            ],
+            "properties": {
+                "overprovision": "[parameters('OverProvision')]",
+                "upgradePolicy": {
+                    "mode": "Automatic"
+                },
+                "virtualMachineProfile": {
+                    "extensionProfile": {
+                        "extensions": [
+                            /*{
+                                "name": "[concat(parameters('Name'), '-ServiceFabric')]",
+                                "properties": {
+                                    "type": "ServiceFabricNode",
+                                    "autoUpgradeMinorVersion": false,
+                                    "protectedSettings": {
+                                        "StorageAccountKey1": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName')), '2015-06-15').key1]",
+                                        "StorageAccountKey2": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('logStorageAccountName')), '2015-06-15').key2]"
+                                    },
+                                    "publisher": "Microsoft.Azure.ServiceFabric",
+                                    "settings": {
+                                        "clusterEndpoint": "[reference(parameters('clusterName')).clusterEndpoint]",
+                                        "nodeTypeRef": "[parameters('Name')]",
+                                        "dataPath": "D:\\\\SvcFab",
+                                        "durabilityLevel": "Bronze"
+                                    },
+                                    "typeHandlerVersion": "1.0"
+                                }
+                            }*/,
+                            {
+                                "name": "[concat(parameters('Name'),'-')]",
+                                "properties": {
+                                    "type": "IaaSDiagnostics",
+                                    "autoUpgradeMinorVersion": true,
+                                    "protectedSettings": {
+                                        "storageAccountName": "[variables('diagStorageAccountName')]",
+                                        "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('diagStorageAccountName')), '2015-06-15').key1]",
+                                        "storageAccountEndPoint": "https://core.windows.net/"
+                                    },
+                                    "publisher": "Microsoft.Azure.Diagnostics",
+                                    "settings": {
+                                        "WadCfg": {
+                                            "DiagnosticMonitorConfiguration": {
+                                                "overallQuotaInMB": "50000",
+                                                "EtwProviders": {
+                                                    "EtwEventSourceProviderConfiguration": [
+                                                        {
+                                                            "provider": "Microsoft-ServiceFabric-Actors",
+                                                            "scheduledTransferKeywordFilter": "1",
+                                                            "scheduledTransferPeriod": "PT5M",
+                                                            "DefaultEvents": {
+                                                                "eventDestination": "ServiceFabricReliableActorEventTable"
+                                                            }
+                                                        },
+                                                        {
+                                                            "provider": "Microsoft-ServiceFabric-Services",
+                                                            "scheduledTransferPeriod": "PT5M",
+                                                            "DefaultEvents": {
+                                                                "eventDestination": "ServiceFabricReliableServiceEventTable"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "EtwManifestProviderConfiguration": [
+                                                        {
+                                                            "provider": "cbd93bc2-71e5-4566-b3a7-595d8eeca6e8",
+                                                            "scheduledTransferLogLevelFilter": "Information",
+                                                            "scheduledTransferKeywordFilter": "4611686018427387904",
+                                                            "scheduledTransferPeriod": "PT5M",
+                                                            "DefaultEvents": {
+                                                                "eventDestination": "ServiceFabricSystemEventTable"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "StorageAccount": "[variables('diagStorageAccountName')]"
+                                    },
+                                    "typeHandlerVersion": "1.5"
+                                }
+                            },
+                            {
+                                "name": "[concat(parameters('Name'),'-Oms')]",
+                                "properties": {
+                                    "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                                    "type": "MicrosoftMonitoringAgent",
+                                    "typeHandlerVersion": "1.0",
+                                    "autoUpgradeMinorVersion": true,
+                                    "settings": {
+                                        "workspaceId": "[reference(variables('workspaceReference'), '2015-11-01-preview').customerId]"
+                                    },
+                                    "protectedSettings": {
+                                        "workspaceKey": "[listKeys(variables('workspaceReference'), '2015-11-01-preview').primarySharedKey]"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "[concat(variables('nicName'), '-0')]",
+                                "properties": {
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "[concat(variables('nicName'), '-', 0)]",
+                                            "properties": {
+                                                "loadBalancerBackendAddressPools": [
+                                                    {
+                                                        "id": "[parameters('LoadBalancerBackendAddressPoolId')]"
+                                                    }
+                                                ],
+                                                "loadBalancerInboundNatPools": [
+                                                    {
+                                                        "id": "[parameters('LoadBalancerInboundNatPoolId')]"
+                                                    }
+                                                ],
+                                                "subnet": {
+                                                    "id": "[parameters('LoadBalancerSubnetId')]"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "primary": true
+                                }
+                            }
+                        ]
+                    },
+                    "osProfile": {
+                        "adminPassword": "[parameters('AdminPassword')]",
+                        "adminUsername": "[parameters('AdminUsername')]",
+                        "computernamePrefix": "[parameters('Name')]"
+                    },
+                    "storageProfile": {
+                        "imageReference": {
+                            "publisher": "[parameters('VmImagePublisher')]",
+                            "offer": "[parameters('VmImageOffer')]",
+                            "sku": "[parameters('VmImageSku')]",
+                            "version": "[parameters('VmImageVersion')]"
+                        },
+                        "osDisk": {
+                            "vhdContainers": [
+                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
+                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
+                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
+                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]",
+                                "[concat('https://', variables('vmStorageAccountName'), '0', '.blob.core.windows.net/', variables('vmStorageAccountContainerName'))]"
+                            ],
+                            "name": "vmssosdisk",
+                            "caching": "ReadOnly",
+                            "createOption": "FromImage"
+                        }
+                    }
+                }
+            },
+            "sku": {
+                "name": "[parameters('VmSize')]",
+                "capacity": "5",
+                "tier": "Standard"
+            }
+        }
+    ]
+}
