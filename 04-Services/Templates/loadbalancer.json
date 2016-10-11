@@ -25,8 +25,13 @@
         "ipName": "[concat(parameters('Name'), '-pip')]",
         "ipAllocationMethod": "dynamic",
         "loadBalancerFrontendIpConfigurationName": "frontendIpConfiguration",
-        "loadBalancerBackendAddressPoolName": "LoadBalancerBEAddressPool",
-        "workspaceId": "[concat('/subscriptions/', parameters('WorkspaceSubscriptionId'), '/resourceGroups/', parameters('WorkspaceResourceGroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('WorkspaceName'))]"
+        "loadBalancerBackendAddressPoolName": "BackendAddressPool0",
+        "loadBalancerInboundNatPoolName": "InboundNatPool0",
+        "loadBalancerId": "[resourceId('Microsoft.Network/loadbalancers', parameters('Name'))]",
+        "loadBalancerFrontendIpConfigurationId": "[concat(variables('loadBalancerId'), '/frontendIPConfigurations/', variables('loadBalancerFrontendIpConfigurationName'))]",
+        "loadBalancerBackendAddressPoolId": "[concat(variables('loadBalancerId'), '/backendAddressPools/', variables('loadBalancerBackendAddressPoolName'))]",
+        "loadBalancerInboundNatPoolId": "[concat(variables('loadBalancerId'), '/inboundNatPools/', variables('loadBalancerInboundNatPoolName'))]",
+        "workspaceId": "[resourceId(parameters('WorkspaceSubscriptionId'), parameters('WorkspaceResourceGroupName'), 'Microsoft.OperationalInsights/workspaces', parameters('WorkspaceName'))]"
     },
     "resources": [
         {
@@ -64,6 +69,20 @@
                     {
                         "name": "[variables('loadBalancerBackendAddressPoolName')]"
                     }
+                ],
+                "inboundNatPools": [
+                    {
+                        "name": "[variables('loadBalancerInboundNatPoolName')]",
+                        "properties": {
+                            "backendPort": 3389,
+                            "frontendIPConfiguration": {
+                                "id": "[variables('loadBalancerFrontendIpConfigurationId')]"
+                            },
+                            "frontendPortRangeEnd": 4500,
+                            "frontendPortRangeStart": 3389,
+                            "protocol": "Tcp"
+                        }
+                    }
                 ]
             },
             "resources": [
@@ -99,5 +118,23 @@
                 }
             ]
         }
-    ]
+    ],
+    "outputs": {
+        "Fqdn": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('ipName'))).dnsSettings.fqdn]"
+        },
+        "FrontendIpConfigurationId": {
+            "type": "string",
+            "value": "[variables('loadBalancerFrontendIpConfigurationId')]"
+        },
+        "BackendAddressPoolId": {
+            "type": "string",
+            "value": "[variables('loadBalancerBackendAddressPoolId')]"
+        },
+        "InboundNatPoolId": {
+            "type": "string",
+            "value": "[variables('loadBalancerInboundNatPoolId')]"
+        }
+    }
 }
