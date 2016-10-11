@@ -17,7 +17,7 @@
         },
         "LogStorageAccountName": {
             "type": "string",
-            "defaultValue": "[concat('salog', uniqueString(parameters('Name'))]"
+            "defaultValue": "[concat('salog', uniqueString(parameters('Name')))]"
         },
         "StorageAccountType": {
             "type": "string",
@@ -138,7 +138,7 @@
                     "extensionProfile": {
                         "extensions": [
                             {
-                                "name": "[concat(parameters('Name'),'-')]",
+                                "name": "[concat(parameters('Name'),'-IaasDiagnostics')]",
                                 "properties": {
                                     "type": "IaaSDiagnostics",
                                     "autoUpgradeMinorVersion": true,
@@ -190,7 +190,7 @@
                                 }
                             },
                             {
-                                "name": "[concat(parameters('Name'),'-Oms')]",
+                                "name": "[concat(parameters('Name'),'-MicrosoftMonitoringAgent')]",
                                 "properties": {
                                     "publisher": "Microsoft.EnterpriseCloud.Monitoring",
                                     "type": "MicrosoftMonitoringAgent",
