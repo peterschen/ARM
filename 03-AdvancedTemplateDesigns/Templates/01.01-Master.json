@@ -24,7 +24,7 @@
         "vmOsSku": {
             "type": "string",
             "allowedValues": [
-                "Windows-Server-Technical-Preview"
+                "2016-Datacenter"
             ]
         },
         "dnsPrefix": {
