@@ -31,7 +31,8 @@
                 "AzureActivity",
                 "ApplicationInsights",
                 "AzureNetworking",
-                "AgentHealthAssessment"
+                "AgentHealthAssessment",
+                "CapacityPerformance"
             ]
         },
         "PromotionCode": {
