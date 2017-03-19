@@ -6,7 +6,7 @@ Configuration ConfigureAzureAutomation
         [parameter(Mandatory = $true)]
         [string] $RegistrationUrl,
 
-        [parameterr(Mandatory = $true)]
+        [parameter(Mandatory = $true)]
         [pscredential] $RegistrationKey,
         
         [int] $RefreshFrequencyMins = 30,
