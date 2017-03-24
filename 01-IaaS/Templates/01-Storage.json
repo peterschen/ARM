@@ -4,14 +4,13 @@
     "parameters": {
     },
     "variables": {
-        "apiVersion": "2015-06-15",
         "location": "[resourceGroup().location]",
         "storageAccountName": "[concat(uniquestring(resourceGroup().id))]",
         "storageAccountType": "Standard_LRS"
     },
     "resources": [
         {
-            "apiVersion": "[variables('apiVersion')]",
+            "apiVersion": "2015-06-15",
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('storageAccountName')]",
             "location": "[variables('location')]",

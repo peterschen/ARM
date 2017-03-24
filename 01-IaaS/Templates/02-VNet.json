@@ -4,7 +4,6 @@
     "parameters": {
     },
     "variables": {
-        "apiVersion": "2015-06-15",
         "location": "[resourceGroup().location]",
         "virtualNetworkName": "vnet",
         "virtualNetworkId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
@@ -15,7 +14,7 @@
     },
     "resources": [
         {
-            "apiVersion": "[variables('apiVersion')]",
+            "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('virtualNetworkName')]",
             "location": "[variables('location')]",
