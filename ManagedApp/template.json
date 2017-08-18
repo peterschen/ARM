@@ -144,6 +144,9 @@
             "id": "[Concat(resourceGroup().id, '/providers/Microsoft.OperationsManagement/solutions/', variables('solutions')[copyIndex()], '(', variables('workspaceName'), ')')]",
             "apiVersion": "2015-11-01-preview",
             "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')]"
+            ],
             "copy": {
                 "name": "solutionsCopy",
                 "count": "[length(variables('solutions'))]"
@@ -514,7 +517,8 @@
                 "count": "[parameters('vmCount')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'), '/backupPolicies/', variables('backupPolicyName'))]"
+                "[concat('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'), '/backupPolicies/', variables('backupPolicyName'))]",
+                "[concat('Microsoft.Compute/virtualMachines/', concat(variables('vmName'), '-', copyIndex()))]"
             ],
             "properties": {
                 "protectedItemType": "Microsoft.Compute/virtualMachines",
