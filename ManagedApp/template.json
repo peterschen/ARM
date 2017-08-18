@@ -139,13 +139,13 @@
             ]
         },
         {
-            "name": "[Concat(variables('solutions')[copyIndex()], '(', variables('workspaceName'), ')')]",
+            "name": "[concat(variables('solutions')[copyIndex()], '(', variables('workspaceName'), ')')]",
             "type": "Microsoft.OperationsManagement/solutions",
-            "id": "[Concat(resourceGroup().id, '/providers/Microsoft.OperationsManagement/solutions/', variables('solutions')[copyIndex()], '(', variables('workspaceName'), ')')]",
+            "id": "[concat(resourceGroup().id, '/providers/Microsoft.OperationsManagement/solutions/', variables('solutions')[copyIndex()], '(', variables('workspaceName'), ')')]",
             "apiVersion": "2015-11-01-preview",
             "location": "[parameters('workspaceLocation')]",
             "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')]"
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
             ],
             "copy": {
                 "name": "solutionsCopy",
