@@ -1,0 +1,749 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string"
+        },
+        "workspaceLocation": {
+            "type": "string"
+        },
+        "applicationPrefix": {
+            "type": "string"
+        },
+        "vmCount": {
+            "type": "int",
+            "minValue": 1
+        },
+        "vmSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_D1_v2"
+            ]
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "vnetAddressPrefix": {
+            "type": "string"
+        },
+        "subnetAddressPrefix": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "workspaceName": "[concat(parameters('applicationPrefix'), '-workspace')]",
+        "automationAccountName": "[concat(parameters('applicationPrefix'), '-automation')]",
+        "recoveryVaultName": "[concat(parameters('applicationPrefix'), '-vault')]",
+        "backupPolicyName": "[concat(parameters('applicationPrefix'), '-DefaultBackupPolicy')]",
+        "backupScheduleRunDays": [
+            "Sunday"
+        ],
+        "backupScheduleRunTimes": [
+            "01:00"
+        ],
+        "backupWeeklyRetentionCount": "52",
+        "backupMonthlyRetentionDays": [
+            "Sunday"
+        ],
+        "backupMonthlyRetentionWeeks": [
+            "First",
+            "Last"
+        ],
+        "backupMonthlyRetentionCount": "24",
+        "backupYearlyRetentionDays": [
+            "Sunday"
+        ],
+        "backupYearlyRetentionWeeks": [
+            "First",
+            "Last"
+        ],
+        "backupYearlyRetentionMonths": [
+            "January",
+            "April",
+            "July",
+            "October"
+        ],
+        "backupYearlyRetentionCount": "10",
+        "vnetName": "[concat(parameters('applicationPrefix'), '-vnet')]",
+        "subnetName": "default",
+        "networkInterfaceName": "[concat(parameters('applicationPrefix'), '-nic')]",
+        "publicIpAddressName": "[concat(parameters('applicationPrefix'), '-pip')]",
+        "vmName": "[concat(parameters('applicationPrefix'), '-vm')]",
+        "networkSecurityGroupName": "[concat(parameters('applicationPrefix'), '-nsg')]",
+        "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+        "subnetId": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+        "solutions": [
+            "AgentHealthAssessment",
+            "Updates"
+        ],
+        "alert1": {
+            "searchName": "Free Disk Space Percentage",
+            "description": "Free disk space of C: is lower than 20%",
+            "severity": "Critical",
+            "query": "Type=Perf ObjectName=LogicalDisk CounterName=\"% Free Space\" InstanceName=\"C:\" | measure avg(CounterValue) by Computer interval 1minute",
+            "alertTresholdValue": 20,
+            "operator": "lt",
+            "alertThrottleInMinutes": 60,
+            "alertBreach": 1,
+            "searchCategory": "Alerting",
+            "scheduleIntervalInMinutes": 5,
+            "scheduleQueryTimeSpan": 5,
+            "alertName": "Free disk space on C: is lower than 20%"
+        },
+        "alertConstruct1": {
+            "searchId": "[concat(toLower(variables('alert1').searchCategory), '|', toLower(variables('alert1').searchName))]",
+            "scheduleId": "[toLower(concat('schedule1-', uniqueString(resourceGroup().id, deployment().name)))]",
+            "alertId": "[toLower(concat('alert1-', uniqueString(resourceGroup().id, deployment().name)))]"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Automation/automationAccounts",
+            "name": "[variables('automationAccountName')]",
+            "apiVersion": "2015-01-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "tags": {},
+            "properties": {
+                "sku": {
+                    "name": "OMS"
+                }
+            }
+        },
+        {
+            "name": "[variables('workspaceName')]",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "properties": {
+                "sku": {
+                    "name": "pernode"
+                }
+            },
+            "resources": [
+                {
+                    "name": "Automation",
+                    "type": "linkedServices",
+                    "apiVersion": "2015-11-01-preview",
+                    "dependsOn": [
+                        "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]",
+                        "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'))]"
+                    ],
+                    "properties": {
+                        "resourceId": "[resourceId('Microsoft.Automation/automationAccounts/', variables('automationAccountName'))]"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[Concat(variables('solutions')[copyIndex()], '(', variables('workspaceName'), ')')]",
+            "type": "Microsoft.OperationsManagement/solutions",
+            "id": "[Concat(resourceGroup().id, '/providers/Microsoft.OperationsManagement/solutions/', variables('solutions')[copyIndex()], '(', variables('workspaceName'), ')')]",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "copy": {
+                "name": "solutionsCopy",
+                "count": "[length(variables('solutions'))]"
+            },
+            "plan": {
+                "name": "[concat(variables('solutions')[copyIndex()], '(', variables('workspaceName'), ')')]",
+                "product": "[Concat('OMSGallery/', variables('solutions')[copyIndex()])]",
+                "publisher": "Microsoft",
+                "promotionCode": ""
+            },
+            "properties": {
+                "workspaceResourceId": "[concat(resourceGroup().id, '/providers/Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/System')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsEvent",
+            "properties": {
+                "eventLogName": "System",
+                "eventTypes": [
+                    {
+                        "eventType": "Error"
+                    },
+                    {
+                        "eventType": "Warning"
+                    },
+                    {
+                        "eventType": "Information"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-LDAvgDiskRead')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Avg. Disk sec/Read"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-LDAvgDiskWrite')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Avg. Disk sec/Write"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-LDCurDiskQueueLength')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Current Disk Queue Length"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-LDCurDiskRead')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Reads/sec"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-LDCurDiskTransfer')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Transfers/sec"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-LDCurDiskWrite')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Writes/sec"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-LDFreeMegabytes')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Free Megabytes"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-LDPercFreeSpace')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "% Free Space"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-MemoryAvailable')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Available MBytes"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-MemoryPercCommited')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "% Committed Bytes In Use"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-NicBytesRecd')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Received/sec"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-NicBytesSent')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Sent/sec"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-NicBytesTotal')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Total/sec"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-ProcessorTimeTotal')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "Processor",
+                "instanceName": "_Total",
+                "intervalSeconds": 10,
+                "counterName": "% Processor Time"
+            }
+        },
+        {
+            "name": "[concat(variables('workspaceName'), '/ds-SystemProcQueueLength')]",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[parameters('workspaceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "kind": "WindowsPerformanceCounter",
+            "properties": {
+                "objectName": "System",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Processor Queue Length"
+            }
+        },
+        {
+            "name": "[variables('recoveryVaultName')]",
+            "type": "Microsoft.RecoveryServices/vaults",
+            "apiVersion": "2015-11-10",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "RS0",
+                "tier": "Standard"
+            },
+            "properties": {}
+        },
+        {
+            "name": "[concat(variables('recoveryVaultName'), '/', variables('backupPolicyName'))]",
+            "type": "Microsoft.RecoveryServices/vaults/backupPolicies",
+            "apiVersion": "2015-11-10",
+            "dependsOn": [
+                "[concat('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'))]"
+            ],
+            "location": "[parameters('location')]",
+            "properties": {
+                "backupManagementType": "AzureIaasVM",
+                "schedulePolicy": {
+                    "scheduleRunFrequency": "Weekly",
+                    "scheduleRunDays": "[variables('backupScheduleRunDays')]",
+                    "scheduleRunTimes": "[variables('backupScheduleRunTimes')]",
+                    "schedulePolicyType": "SimpleSchedulePolicy"
+                },
+                "retentionPolicy": {
+                    "dailySchedule": null,
+                    "weeklySchedule": {
+                        "daysOfTheWeek": "[variables('backupScheduleRunDays')]",
+                        "retentionTimes": "[variables('backupScheduleRunTimes')]",
+                        "retentionDuration": {
+                            "count": "[variables('backupWeeklyRetentionCount')]",
+                            "durationType": "Weeks"
+                        }
+                    },
+                    "monthlySchedule": {
+                        "retentionScheduleFormatType": "Weekly",
+                        "retentionScheduleDaily": {
+                            "daysOfTheMonth": [
+                                {
+                                    "date": 1,
+                                    "isLast": false
+                                }
+                            ]
+                        },
+                        "retentionScheduleWeekly": {
+                            "daysOfTheWeek": "[variables('backupMonthlyRetentionDays')]",
+                            "weeksOfTheMonth": "[variables('backupMonthlyRetentionWeeks')]"
+                        },
+                        "retentionTimes": "[variables('backupScheduleRunTimes')]",
+                        "retentionDuration": {
+                            "count": "[variables('backupMonthlyRetentionCount')]",
+                            "durationType": "Months"
+                        }
+                    },
+                    "yearlySchedule": {
+                        "retentionScheduleFormatType": "Weekly",
+                        "monthsOfYear": "[variables('backupYearlyRetentionMonths')]",
+                        "retentionScheduleDaily": {
+                            "daysOfTheMonth": [
+                                {
+                                    "date": 1,
+                                    "isLast": false
+                                }
+                            ]
+                        },
+                        "retentionScheduleWeekly": {
+                            "daysOfTheWeek": "[variables('backupYearlyRetentionDays')]",
+                            "weeksOfTheMonth": "[variables('backupYearlyRetentionWeeks')]"
+                        },
+                        "retentionTimes": "[variables('backupScheduleRunTimes')]",
+                        "retentionDuration": {
+                            "count": "[variables('backupYearlyRetentionCount')]",
+                            "durationType": "Years"
+                        }
+                    },
+                    "retentionPolicyType": "LongTermRetentionPolicy"
+                }
+            }
+        },
+        {
+            "name": "[concat(variables('recoveryVaultName'), '/Azure/iaasvmcontainer;iaasvmcontainerv2;', resourceGroup().name, ';', variables('vmName'), '-', copyIndex(), '/vm;iaasvmcontainerv2;', resourceGroup().name, ';', variables('vmName'), '-', copyIndex())]",
+            "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+            "apiVersion": "2016-06-01",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "backupCopy",
+                "count": "[parameters('vmCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'), '/backupPolicies/', variables('backupPolicyName'))]"
+            ],
+            "properties": {
+                "protectedItemType": "Microsoft.Compute/virtualMachines",
+                "policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('backupPolicyName'))]",
+                "sourceResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('vmName'), '-', copyIndex()))]"
+            }
+        },
+        {
+            "name": "[variables('vnetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2016-12-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vnetAddressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetAddressPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('networkSecurityGroupName')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2016-09-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "priority": 1000,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "3389",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(variables('publicIpAddressName'), '-', copyIndex())]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2016-11-01",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "pipCopy",
+                "count": "[parameters('vmCount')]"
+            },
+            "properties": {
+                "publicIpAllocationMethod": "dynamic"
+            }
+        },
+        {
+            "name": "[concat(variables('networkInterfaceName'), '-', copyIndex())]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2016-09-01",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "nicCopy",
+                "count": "[parameters('vmCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'), '-', copyIndex())]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetId')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat(variables('publicIpAddressName'), '-', copyIndex()))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                }
+            }
+        },
+        {
+            "name": "[concat(variables('vmName'), '-', copyIndex())]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2016-04-30-preview",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "vmCopy",
+                "count": "[parameters('vmCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'), '-', copyIndex())]"
+            ],
+            "properties": {
+                "osProfile": {
+                    "computerName": "[concat(variables('vmName'), '-', copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVmAgent": "true"
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    },
+                    "dataDisks": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceName'), '-', copyIndex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[concat(variables('vmName'), '-', copyIndex(), '/OmsAgent')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '-', copyIndex())]"
+            ],
+            "copy": {
+                "name": "omsCopy",
+                "count": "[parameters('vmCount')]"
+            },
+            "properties": {
+                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                "type": "MicrosoftMonitoringAgent",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-03-20').customerId]"
+                },
+                "protectedSettings": {
+                    "workspaceKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-03-20').primarySharedKey]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/savedSearches",
+            "name": "[concat(variables('workspaceName'), '/', variables('alertConstruct1').searchId)]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
+            ],
+            "properties": {
+                "etag": "*",
+                "query": "[variables('alert1').query]",
+                "displayName": "[variables('alert1').searchName]",
+                "category": "[variables('alert1').searchCategory]"
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/savedSearches/schedules",
+            "name": "[concat(variables('workspaceName'), '/', variables('alertConstruct1').searchId, '/', variables('alertConstruct1').scheduleId)]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]",
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'), '/savedSearches/', variables('alertConstruct1').searchId)]"
+            ],
+            "properties": {
+                "etag": "*",
+                "Interval": "[variables('alert1').scheduleIntervalInMinutes]",
+                "QueryTimeSpan": "[variables('alert1').scheduleQueryTimeSpan]",
+                "enabled": true
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationalInsights/workspaces/savedSearches/schedules/actions",
+            "name": "[concat(variables('workspaceName'), '/', variables('alertConstruct1').searchId, '/', variables('alertConstruct1').scheduleId, '/', variables('alertConstruct1').alertId)]",
+            "dependsOn": [
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]",
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'), '/savedSearches/', variables('alertConstruct1').searchId)]",
+                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'), '/savedSearches/', variables('alertConstruct1').searchId, '/schedules/', variables('alertConstruct1').scheduleId)]"
+            ],
+            "properties": {
+                "etag": "*",
+                "Type": "Alert",
+                "Name": "[variables('alert1').alertName]",
+                "Description": "[variables('alert1').description]",
+                "Severity": "[variables('alert1').severity]",
+                "Throttling": {
+                    "DurationInMinutes": "[variables('alert1').alertThrottleInMinutes]"
+                },
+                "Threshold": {
+                    "Operator": "[variables('alert1').operator]",
+                    "Value": "[variables('alert1').alertTresholdValue]",
+                    "MetricsTrigger": {
+                        "TriggerCondition": "Total",
+                        "Operator": "[variables('alert1').operator]",
+                        "Value": "[variables('alert1').alertBreach]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
