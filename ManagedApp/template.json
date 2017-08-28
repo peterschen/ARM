@@ -80,6 +80,128 @@
             "AgentHealthAssessment",
             "Updates"
         ],
+        "dataSources": [
+            {
+                "name": "LogicalDisk-AvgDiskSecPerRead",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Avg. Disk sec/Read"
+            },
+            {
+                "name": "LogicalDisk-AvgDiskSecPerWrite",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Avg. Disk sec/Write"
+            },
+            {
+                "name": "LogicalDisk-DiskReadPerSec",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Reads/sec"
+            },
+            {
+                "name": "LogicalDisk-DiskWritePerSec",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Writes/sec"
+            },
+            {
+                "name": "LogicalDisk-DiskTransfersPerSec",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Disk Transfers/sec"
+            },
+            {
+                "name": "LogicalDisk-CurDiskQueueLength",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Current Disk Queue Length"
+            },
+            {
+                "name": "LogicalDisk-FreeMegabytes",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Free Megabytes"
+            },
+            {
+                "name": "LogicalDisk-PercFreeSpace",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "% Free Space"
+            },
+            {
+                "name": "Memory-AvailableMegabytes",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Available MBytes"
+            },
+            {
+                "name": "Memory-PercCommittedBytesInUse",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "% Committed Bytes In Use"
+            },
+            {
+                "name": "NetworkAdapter-BytesRecdPerSec",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Received/sec"
+            },
+            {
+                "name": "NetworkAdapter-BytesSentPerSec",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Sent/sec"
+            },
+            {
+                "name": "NetworkAdapter-BytesTotalPerSec",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Bytes Total/sec"
+            },
+            {
+                "name": "Processor-PercProcessorTime",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "Processor",
+                "instanceName": "_Total",
+                "intervalSeconds": 10,
+                "counterName": "% Processor Time"
+            },
+            {
+                "name": "System-ProcQueueLength",
+                "kind": "WindowsPerformanceCounter",
+                "objectName": "System",
+                "instanceName": "*",
+                "intervalSeconds": 10,
+                "counterName": "Processor Queue Length"
+            }
+        ],
         "alert1": {
             "searchName": "Free Disk Space Percentage",
             "description": "Free disk space of C: is lower than 20%",
@@ -190,243 +312,23 @@
             }
         },
         {
-            "name": "[concat(variables('workspaceName'), '/ds-LDAvgDiskRead')]",
+            "name": "[concat(variables('workspaceName'), '/', variables('dataSources')[copyIndex()].name)]",
             "type": "Microsoft.OperationalInsights/workspaces/datasources",
             "apiVersion": "2015-11-01-preview",
             "location": "[parameters('workspaceLocation')]",
             "dependsOn": [
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
             ],
-            "kind": "WindowsPerformanceCounter",
+            "copy": {
+                "name": "datasourceCopy",
+                "count": "[length(variables('dataSources'))]"
+            },
+            "kind": "[variables('dataSources')[copyIndex()].kind]",
             "properties": {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Avg. Disk sec/Read"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-LDAvgDiskWrite')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Avg. Disk sec/Write"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-LDCurDiskQueueLength')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Current Disk Queue Length"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-LDCurDiskRead')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Disk Reads/sec"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-LDCurDiskTransfer')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Disk Transfers/sec"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-LDCurDiskWrite')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Disk Writes/sec"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-LDFreeMegabytes')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Free Megabytes"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-LDPercFreeSpace')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "% Free Space"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-MemoryAvailable')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "Memory",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Available MBytes"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-MemoryPercCommited')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "Memory",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "% Committed Bytes In Use"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-NicBytesRecd')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "Network Adapter",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Bytes Received/sec"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-NicBytesSent')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "Network Adapter",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Bytes Sent/sec"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-NicBytesTotal')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "Network Adapter",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Bytes Total/sec"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-ProcessorTimeTotal')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "Processor",
-                "instanceName": "_Total",
-                "intervalSeconds": 10,
-                "counterName": "% Processor Time"
-            }
-        },
-        {
-            "name": "[concat(variables('workspaceName'), '/ds-SystemProcQueueLength')]",
-            "type": "Microsoft.OperationalInsights/workspaces/datasources",
-            "apiVersion": "2015-11-01-preview",
-            "location": "[parameters('workspaceLocation')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
-            ],
-            "kind": "WindowsPerformanceCounter",
-            "properties": {
-                "objectName": "System",
-                "instanceName": "*",
-                "intervalSeconds": 10,
-                "counterName": "Processor Queue Length"
+                "objectName": "[variables('dataSources')[copyIndex()].objectName]",
+                "instanceName": "[variables('dataSources')[copyIndex()].instanceName]",
+                "intervalSeconds": "[variables('dataSources')[copyIndex()].IntervalSeconds]",
+                "counterName": "[variables('dataSources')[copyIndex()].counterName]"
             }
         },
         {
