@@ -84,7 +84,7 @@
             "searchName": "Free Disk Space Percentage",
             "description": "Free disk space of C: is lower than 20%",
             "severity": "Critical",
-            "query": "Type=Perf ObjectName=LogicalDisk CounterName=\"% Free Space\" InstanceName=\"C:\" | measure avg(CounterValue) by Computer interval 1minute",
+            "query": "Perf | where TimeGenerated > ago(5m) | where ObjectName == \"LogicalDisk\" | where CounterName == \"% Free Space\" | where InstanceName == \"C:\" | summarize avg=avg(CounterValue) by bin(TimeGenerated, 1s), Computer",
             "alertTresholdValue": 20,
             "operator": "lt",
             "alertThrottleInMinutes": 60,
@@ -116,11 +116,15 @@
         {
             "name": "[variables('workspaceName')]",
             "type": "Microsoft.OperationalInsights/workspaces",
-            "apiVersion": "2015-11-01-preview",
+            "apiVersion": "2017-03-15-preview",
             "location": "[parameters('workspaceLocation')]",
             "properties": {
                 "sku": {
                     "name": "pernode"
+                },
+                "features": {
+                    "legacy": 0,
+                    "searchVersion": 1
                 }
             },
             "resources": [
@@ -691,9 +695,9 @@
             }
         },
         {
-            "apiVersion": "2015-11-01-preview",
-            "type": "Microsoft.OperationalInsights/workspaces/savedSearches",
             "name": "[concat(variables('workspaceName'), '/', variables('alertConstruct1').searchId)]",
+            "type": "Microsoft.OperationalInsights/workspaces/savedSearches",
+            "apiVersion": "2017-03-15-preview",
             "dependsOn": [
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]"
             ],
@@ -705,9 +709,9 @@
             }
         },
         {
-            "apiVersion": "2015-11-01-preview",
-            "type": "Microsoft.OperationalInsights/workspaces/savedSearches/schedules",
             "name": "[concat(variables('workspaceName'), '/', variables('alertConstruct1').searchId, '/', variables('alertConstruct1').scheduleId)]",
+            "type": "Microsoft.OperationalInsights/workspaces/savedSearches/schedules",
+            "apiVersion": "2017-03-15-preview",
             "dependsOn": [
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'), '/savedSearches/', variables('alertConstruct1').searchId)]"
@@ -720,9 +724,9 @@
             }
         },
         {
-            "apiVersion": "2015-11-01-preview",
-            "type": "Microsoft.OperationalInsights/workspaces/savedSearches/schedules/actions",
             "name": "[concat(variables('workspaceName'), '/', variables('alertConstruct1').searchId, '/', variables('alertConstruct1').scheduleId, '/', variables('alertConstruct1').alertId)]",
+            "type": "Microsoft.OperationalInsights/workspaces/savedSearches/schedules/actions",
+            "apiVersion": "2017-03-15-preview",
             "dependsOn": [
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'))]",
                 "[concat('Microsoft.OperationalInsights/workspaces/', variables('workspaceName'), '/savedSearches/', variables('alertConstruct1').searchId)]",
